@@ -4,6 +4,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
+import os
+import shutil
 
 # Pfad zum ChromeDriver (ändern Sie diesen Pfad entsprechend Ihres Systems)
 driver_path = 'D:\chromedriver-win64\chromedriver-win64\chromedriver.exe'  # z.B. 'D:/chromedriver.exe'
@@ -79,6 +81,15 @@ except Exception as e:
     print("Dowload Button (rot) nicht gefunden oder konnte nicht geklickt werden:", e)
 
 time.sleep(5) #warte zeit damit es fertig downloaden kann
+
+# Verschiebe die heruntergeladene Datei ins Repository
+download_folder = os.path.expanduser("~/Downloads")
+destination_folder = os.path.expanduser(".")
+
+for file in os.listdir(download_folder):
+    if file.endswith(".zip"):  # Passe das Dateiformat an
+        shutil.move(os.path.join(download_folder, file), os.path.join(destination_folder, file))
+        print(f"Datei {file} wurde ins Repository verschoben.")
 
 #input()
 # Schließen des Browsers
