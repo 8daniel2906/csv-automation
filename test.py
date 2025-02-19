@@ -10,7 +10,7 @@ import shutil
 # Pfad zum ChromeDriver (ändern Sie diesen Pfad entsprechend Ihres Systems)
 
 #driver_path = 'D:\chromedriver-win64\chromedriver-win64\chromedriver.exe'  # z.B. 'D:/chromedriver.exe'
-driver_path = './.github/workflows/chromedriver.exe'
+driver_path = 'chromedriver.exe'
 
 
 
