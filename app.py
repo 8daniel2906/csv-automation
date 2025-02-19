@@ -1,27 +1,27 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-
 import requests
 
+# Raw-Link zur CSV-Datei
 csv_url = "https://raw.githubusercontent.com/8daniel2906/csv-automation/9fb2c6fe5f2ee5c1e10ae5344d48d88b9c3dbafc/sensor_data.csv"
+
+# Lade die CSV-Datei und überprüfe den Status
 response = requests.get(csv_url)
 
 if response.status_code == 200:
     st.text("CSV-Datei erfolgreich geladen!")
-    st.code(response.text[:500])  # Zeigt die ersten 500 Zeichen
+    st.code(response.text[:500])  # Zeigt die ersten 500 Zeichen der Datei an
 else:
     st.error(f"Fehler beim Laden der Datei: {response.status_code}")
 
 # Streamlit App-Titel
 st.title("Live CSV-Plot aus GitHub")
 
-# CSV-Datei aus GitHub laden
-csv_url = "https://github.com/8daniel2906/csv-automation/blob/9fb2c6fe5f2ee5c1e10ae5344d48d88b9c3dbafc/sensor_data.csv"  # Ersetze mit deinem Dateinamen
-
 @st.cache_data
 def load_data(url):
-    return pd.read_csv(url, delimiter=r"\s+", names=["Zeit", "Wert"], skiprows=1)
+    # Lade die CSV-Datei von der Raw-URL
+    return pd.read_csv(url, delimiter=",", names=["Zeit", "Wert"], skiprows=1)
 
 # Lade die Daten
 df = load_data(csv_url)
