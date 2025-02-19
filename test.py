@@ -26,8 +26,9 @@ options.add_argument("--headless")  # Headless-Modus für GitHub Actions
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 
+service.start()
 
-driver = webdriver.Chrome(service=service, options=options)
+driver = webdriver.Remote(service.service_url, options=options)
 
 
 
