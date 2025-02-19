@@ -13,13 +13,21 @@ jobs:
       - name: Repository auschecken
         uses: actions/checkout@v4
 
-      - name: Installiere Abhängigkeiten
+      - name: Installiere Google Chrome und Chromedriver
         run: |
+          # Installiere die neueste Version von Google Chrome
           sudo apt update
-          sudo apt install -y wget unzip
+          sudo apt install -y wget curl unzip
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo dpkg -i google-chrome-stable_current_amd64.deb || sudo apt --fix-broken install -y
-          wget https://chromedriver.storage.googleapis.com/$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE)/chromedriver_linux64.zip
+
+          # Extrahiere die installierte Chrome-Version
+          CHROME_VERSION=$(google-chrome-stable --version | sed 's/[^0-9]*\([0-9]*\.[0-9]*\.[0-9]*\).[0-9]*/\1/')
+          echo "Google Chrome Version: $CHROME_VERSION"
+
+          # Lade die passende Version von Chromedriver herunter
+          CHROMEDRIVER_VERSION=$(curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION)
+          wget https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
           unzip chromedriver_linux64.zip
           sudo mv chromedriver /usr/local/bin/
 
