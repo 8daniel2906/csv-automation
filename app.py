@@ -29,16 +29,30 @@ df = load_data(csv_url)
 # Zeitspalte in Datetime umwandeln
 df["Zeit"] = pd.to_datetime(df["Zeit"])
 
+# Setze den Zeitstempel als Index
+df.set_index("Zeit", inplace=True)
+
+# Generiere eine vollständige Zeitreihe für alle Minuten im gewünschten Bereich
+start_time = df.index.min()
+end_time = df.index.max()
+full_time_index = pd.date_range(start=start_time, end=end_time, freq="T")
+
+# Reindexiere den DataFrame, um alle Minuten abzudecken
+df = df.reindex(full_time_index)
+
+# Führe die lineare Interpolation für fehlende Werte durch
+df["Wert"] = df["Wert"].interpolate(method="linear")
+
 # Zeige die Daten in der App
-st.write("### Vorschau der Daten")
+st.write("### Vorschau der Daten nach Interpolation")
 st.dataframe(df.head())
 
 # Plot erstellen
 fig, ax = plt.subplots(figsize=(10, 5))
-ax.plot(df["Zeit"], df["Wert"], marker="o", linestyle="-")
+ax.plot(df.index, df["Wert"], marker="o", linestyle="-")
 ax.set_xlabel("Zeit")
 ax.set_ylabel("Wert")
-ax.set_title("Werte über Zeit")
+ax.set_title("Werte über Zeit (mit Interpolation)")
 ax.grid(True)
 plt.xticks(rotation=45)
 
