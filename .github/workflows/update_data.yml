@@ -1,0 +1,40 @@
+name: Automatische Datenaktualisierung
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"  # Alle 5 Minuten ausführen
+  workflow_dispatch:  # Erlaubt manuelles Starten über GitHub UI
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest  # Läuft auf einem Linux-Server von GitHub
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+
+      - name: Python einrichten
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Abhängigkeiten installieren
+        run: |
+          pip install requests pyyaml
+
+      - name: Alte JSON- und CSV-Dateien löschen
+        run: |
+          rm -f sensor_data.json sensor_data.csv
+
+      - name: API-Daten abrufen
+        run: python api.py
+
+      - name: JSON in CSV konvertieren
+        run: python 2_csv.py
+
+      - name: Änderungen committen und pushen
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add sensor_data.json sensor_data.csv
+          git commit -m "🔄 Automatische Aktualisierung der Sensordaten" || echo "Keine Änderungen zum Commit"
+          git push
