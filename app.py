@@ -43,10 +43,6 @@ df = df.reindex(full_time_index)
 # Führe die lineare Interpolation für fehlende Werte durch
 df["Wert"] = df["Wert"].interpolate(method="linear")
 
-# Zeige die Daten in der App
-st.write("### Vorschau der Daten nach Interpolation")
-st.dataframe(df.head())
-
 # Plot erstellen
 fig, ax = plt.subplots(figsize=(10, 5))
 ax.plot(df.index, df["Wert"], marker="o", linestyle="-")
