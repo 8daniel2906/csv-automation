@@ -2,7 +2,7 @@ name: Selenium Download
 
 on:
   schedule:
-    - cron: '* /5 * * * *'  # Läuft täglich um 12:00 Uhr UTC
+    - cron: '*/5 * * * *'  # Läuft täglich um 12:00 Uhr UTC
   workflow_dispatch:  # Ermöglicht manuelles Starten
 
 jobs:
