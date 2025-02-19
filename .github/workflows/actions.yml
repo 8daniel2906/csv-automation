@@ -22,6 +22,21 @@ jobs:
       #- name: Set executable permission for chromedriver
         #run: chmod +x ./.github/workflows/chromedriver
 
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip
+
+      - name: Download ChromeDriver 133
+        run: |
+          # Lade die Version 133 des ChromeDrivers herunter
+          wget https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.126/linux64/chromedriver-linux64.zip
+          unzip chromedriver-linux64.zip
+          sudo mv chromedriver-linux64/chromedriver /usr/local/bin/
+
+      - name: Verify ChromeDriver installation
+        run: chromedriver --version
+
       - name: Starte Selenium-Skript
         run: python test.py
         env:
