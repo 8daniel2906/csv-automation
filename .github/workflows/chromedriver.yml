@@ -16,11 +16,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up Node.js (optional, falls du Node.js benötigst)
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -29,8 +24,8 @@ jobs:
       - name: Download ChromeDriver 133
         run: |
           # Lade die Version 133 des ChromeDrivers herunter
-          wget https://chromedriver.storage.googleapis.com/133.0.6943.126/chromedriver_linux64.zip
-          unzip chromedriver_linux64.zip
+          wget https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.126/linux64/chromedriver-linux64.zip
+          unzip chromedriver-linux64.zip
           sudo mv chromedriver /usr/local/bin/
 
       - name: Verify ChromeDriver installation
