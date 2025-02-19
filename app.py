@@ -2,6 +2,17 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
+import requests
+
+csv_url = "https://github.com/8daniel2906/csv-automation/blob/9fb2c6fe5f2ee5c1e10ae5344d48d88b9c3dbafc/sensor_data.csv"
+response = requests.get(csv_url)
+
+if response.status_code == 200:
+    st.text("CSV-Datei erfolgreich geladen!")
+    st.code(response.text[:500])  # Zeigt die ersten 500 Zeichen
+else:
+    st.error(f"Fehler beim Laden der Datei: {response.status_code}")
+
 # Streamlit App-Titel
 st.title("Live CSV-Plot aus GitHub")
 
