@@ -40,6 +40,10 @@ jobs:
       - name: Set ChromeDriver permissions
         run: sudo chmod +x /usr/local/bin/chromedriver
 
+      - name: Check running processes
+        run: ps aux | grep chromedriver
+
+
       - name: Starte Selenium-Skript
         run: python test.py
         env:
