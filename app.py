@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 st.title("Live CSV-Plot aus GitHub")
 
 # CSV-Datei aus GitHub laden
-csv_url = "https://github.com/8daniel2906/csv-automation.git/main/sensor_data.csv"  # Ersetze mit deinem Dateinamen
+csv_url = "https://github.com/8daniel2906/csv-automation/blob/9fb2c6fe5f2ee5c1e10ae5344d48d88b9c3dbafc/sensor_data.csv"  # Ersetze mit deinem Dateinamen
 
 @st.cache_data
 def load_data(url):
