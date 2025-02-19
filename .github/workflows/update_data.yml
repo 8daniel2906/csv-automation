@@ -37,4 +37,5 @@ jobs:
           git config --global user.email "github-actions@github.com"
           git add sensor_data.json sensor_data.csv
           git commit -m "🔄 Automatische Aktualisierung der Sensordaten" || echo "Keine Änderungen zum Commit"
-          git push
+          git push https://x-access-token:${GH_TOKEN}@github.com/8daniel2906/csv-automation.git main
+
