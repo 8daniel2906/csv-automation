@@ -26,7 +26,7 @@ jobs:
           # Lade die Version 133 des ChromeDrivers herunter
           wget https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.126/linux64/chromedriver-linux64.zip
           unzip chromedriver-linux64.zip
-          sudo mv chromedriver /usr/local/bin/
+          sudo mv chromedriver-linux64/chromedriver /usr/local/bin/
 
       - name: Verify ChromeDriver installation
         run: chromedriver --version
