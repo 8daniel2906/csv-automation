@@ -30,7 +30,7 @@ options.add_argument("--disable-dev-shm-usage")
 # Initialisieren des WebDrivers
 driver = webdriver.Chrome(service=service, options=options)
 
-driver.set_page_load_timeout(120)  # Timeout auf 120 Sekunden erhöhen
+
 
 # Öffnen der Website
 driver.get("https://www.opensensorweb.de/de/data/?c=9.978306%2C53.468213&sid=pikobytes%24bafg%245952025%24w&v=sidebar&te=2025-02-11T23%3A00%3A00.000Z%2C2025-02-19T22%3A59%3A59.999Z&z=13.88")
