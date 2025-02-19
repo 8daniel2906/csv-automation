@@ -20,7 +20,7 @@ jobs:
           pip install selenium
 
       - name: Starte Selenium-Skript
-        run: python download_script.py
+        run: python test.py
         env:
           DISPLAY: :99
 
