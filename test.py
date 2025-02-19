@@ -16,7 +16,10 @@ driver_path = '/usr/local/bin/chromedriver'
 
 
 # Verwenden Sie die Service-Klasse, um den Pfad zum WebDriver anzugeben
-service = Service(driver_path)
+#service = Service(driver_path)
+
+service = Service("/usr/local/bin/chromedriver")
+
 
 options = webdriver.ChromeOptions()
 options.add_argument("--headless")  # Headless-Modus für GitHub Actions
@@ -24,10 +27,6 @@ options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 
 
-
-
-
-# Initialisieren des WebDrivers
 driver = webdriver.Chrome(service=service, options=options)
 
 
