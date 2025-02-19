@@ -8,13 +8,27 @@ import os
 import shutil
 
 # Pfad zum ChromeDriver (ändern Sie diesen Pfad entsprechend Ihres Systems)
-driver_path = 'D:\chromedriver-win64\chromedriver-win64\chromedriver.exe'  # z.B. 'D:/chromedriver.exe'
+
+#driver_path = 'D:\chromedriver-win64\chromedriver-win64\chromedriver.exe'  # z.B. 'D:/chromedriver.exe'
+driver_path = '/usr/local/bin/chromedriver'
+
+
+
 
 # Verwenden Sie die Service-Klasse, um den Pfad zum WebDriver anzugeben
 service = Service(driver_path)
 
+options = webdriver.ChromeOptions()
+options.add_argument("--headless")  # Headless-Modus für GitHub Actions
+options.add_argument("--no-sandbox")
+options.add_argument("--disable-dev-shm-usage")
+
+
+
+
+
 # Initialisieren des WebDrivers
-driver = webdriver.Chrome(service=service)
+driver = webdriver.Chrome(service=service, options=options)
 
 # Öffnen der Website
 driver.get("https://www.opensensorweb.de/de/data/?c=9.978306%2C53.468213&sid=pikobytes%24bafg%245952025%24w&v=sidebar&te=2025-02-11T23%3A00%3A00.000Z%2C2025-02-19T22%3A59%3A59.999Z&z=13.88")
@@ -93,4 +107,4 @@ for file in os.listdir(download_folder):
 
 #input()
 # Schließen des Browsers
-# driver.quit()
+driver.quit()
