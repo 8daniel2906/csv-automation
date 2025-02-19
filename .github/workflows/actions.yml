@@ -19,7 +19,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install selenium
       - name: Set executable permission for chromedriver
-        run: chmod +x ./.github/workflows/chromedriver.exe
+        run: chmod +x ./.github/workflows/chromedriver
 
       - name: Starte Selenium-Skript
         run: python test.py
