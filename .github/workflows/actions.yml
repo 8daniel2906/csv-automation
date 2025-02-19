@@ -2,7 +2,7 @@ name: Selenium Download
 
 on:
   schedule:
-    - cron: '*/5 * * * *'  # Läuft täglich um 12:00 Uhr UTC
+    - cron: '* /5 * * * *'  # Läuft täglich um 12:00 Uhr UTC
   workflow_dispatch:  # Ermöglicht manuelles Starten
 
 jobs:
@@ -25,8 +25,11 @@ jobs:
           CHROME_VERSION=$(google-chrome-stable --version | sed 's/[^0-9]*\([0-9]*\.[0-9]*\.[0-9]*\).[0-9]*/\1/')
           echo "Google Chrome Version: $CHROME_VERSION"
 
-          # Lade die passende Version von Chromedriver herunter
+          # Lade die passende Version von Chromedriver herunter (wichtig: benutze die richtige Chrome-Version)
           CHROMEDRIVER_VERSION=$(curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION)
+          echo "Chromedriver Version: $CHROMEDRIVER_VERSION"
+          
+          # Lade den Chromedriver mit der passenden Version
           wget https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
           unzip chromedriver_linux64.zip
           sudo mv chromedriver /usr/local/bin/
