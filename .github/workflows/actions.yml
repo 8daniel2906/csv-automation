@@ -13,32 +13,6 @@ jobs:
       - name: Repository auschecken
         uses: actions/checkout@v4
 
-      - name: Installiere Google Chrome und Chromedriver
-        run: |
-          # Installiere die neueste Version von Google Chrome
-          sudo apt update
-          sudo apt install -y wget curl unzip
-          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-          sudo dpkg -i google-chrome-stable_current_amd64.deb || sudo apt --fix-broken install -y
-
-          # Extrahiere die installierte Chrome-Version
-          CHROME_VERSION=$(google-chrome-stable --version | sed 's/[^0-9]*\([0-9]*\.[0-9]*\.[0-9]*\).[0-9]*/\1/')
-          echo "Google Chrome Version: $CHROME_VERSION"
-
-          # Manuell eine funktionierende Version von chromedriver basierend auf der Version von Chrome installieren
-          # Google Chrome Version 133.x erfordert Chromedriver 133.x. Wenn dies nicht verfügbar ist, verwenden wir eine vorherige Version
-          if [[ "$CHROME_VERSION" == "133.0.6943" ]]; then
-            CHROMEDRIVER_VERSION="133.0.6943.126"
-          else
-            CHROMEDRIVER_VERSION="113.0.5672.63"  # Beispielversion, wenn 133 nicht verfügbar ist
-          fi
-
-          echo "Verwende Chromedriver Version: $CHROMEDRIVER_VERSION"
-          
-          # Lade den Chromedriver herunter
-          wget https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
-          unzip chromedriver_linux64.zip
-          sudo mv chromedriver /usr/local/bin/
 
       - name: Installiere Python-Abhängigkeiten
         run: |
@@ -46,7 +20,7 @@ jobs:
           pip install selenium
 
       - name: Starte Selenium-Skript
-        run: python test.py
+        run: python download_script.py
         env:
           DISPLAY: :99
 
