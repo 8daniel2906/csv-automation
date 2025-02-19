@@ -22,7 +22,7 @@ service = Service("/usr/local/bin/chromedriver")
 
 
 options = webdriver.ChromeOptions()
-options.add_argument("--headless=new")  # Headless-Modus für GitHub Actions
+#options.add_argument("--headless=new")  # Headless-Modus für GitHub Actions
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 
