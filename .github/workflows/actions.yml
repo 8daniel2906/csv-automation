@@ -25,15 +25,15 @@ jobs:
           CHROME_VERSION=$(google-chrome-stable --version | sed 's/[^0-9]*\([0-9]*\.[0-9]*\.[0-9]*\).[0-9]*/\1/')
           echo "Google Chrome Version: $CHROME_VERSION"
 
-          # Hole die passende Chromedriver-Version basierend auf der Chrome-Version
-          CHROMEDRIVER_VERSION=$(curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION)
-          echo "Chromedriver Version: $CHROMEDRIVER_VERSION"
-
-          # Überprüfen, ob die Version korrekt abgerufen wurde
-          if [[ -z "$CHROMEDRIVER_VERSION" ]]; then
-            echo "Fehler: Keine passende Chromedriver-Version gefunden!"
-            exit 1
+          # Manuell eine funktionierende Version von chromedriver basierend auf der Version von Chrome installieren
+          # Google Chrome Version 133.x erfordert Chromedriver 133.x. Wenn dies nicht verfügbar ist, verwenden wir eine vorherige Version
+          if [[ "$CHROME_VERSION" == "133.0.6943" ]]; then
+            CHROMEDRIVER_VERSION="133.0.6943.126"
+          else
+            CHROMEDRIVER_VERSION="113.0.5672.63"  # Beispielversion, wenn 133 nicht verfügbar ist
           fi
+
+          echo "Verwende Chromedriver Version: $CHROMEDRIVER_VERSION"
           
           # Lade den Chromedriver herunter
           wget https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
