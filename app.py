@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 import requests
 
-csv_url = "https://github.com/8daniel2906/csv-automation/blob/9fb2c6fe5f2ee5c1e10ae5344d48d88b9c3dbafc/sensor_data.csv"
+csv_url = "https://raw.githubusercontent.com/8daniel2906/csv-automation/9fb2c6fe5f2ee5c1e10ae5344d48d88b9c3dbafc/sensor_data.csv"
 response = requests.get(csv_url)
 
 if response.status_code == 200:
