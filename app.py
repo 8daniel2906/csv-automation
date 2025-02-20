@@ -17,7 +17,7 @@ else:
     st.error(f"Fehler beim Laden der Datei: {response.status_code}")
 
 # Streamlit App-Titel
-st.title("Live CSV-Plot aus GitHub")
+st.title("Live TEST CSV-Plot aus GitHub")
 
 @st.cache_data
 def load_data(url):
