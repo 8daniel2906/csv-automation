@@ -20,9 +20,9 @@ else:
 st.title("Live TEST CSV-Plot aus GitHub")
 
 @st.cache_data
-def load_data(url):
+def load_data(csv_url):
     # Lade die CSV-Datei von der Raw-URL
-    return pd.read_csv(url, delimiter=",", names=["Zeit", "Wert"], skiprows=1)
+    return pd.read_csv(csv_url, delimiter=",", names=["Zeit", "Wert"], skiprows=1)
 
 # Lade die Daten
 df = load_data(csv_url)
