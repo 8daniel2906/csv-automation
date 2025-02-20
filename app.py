@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import requests
 
 # Raw-Link zur CSV-Datei
-csv_url = "https://raw.githubusercontent.com/8daniel2906/csv-automation/main/sensor_data.csv
+csv_url = "https://raw.githubusercontent.com/8daniel2906/csv-automation/main/sensor_data.csv"
 "
 
 # Lade die CSV-Datei und überprüfe den Status
