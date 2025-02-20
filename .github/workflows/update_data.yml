@@ -2,7 +2,7 @@ name: Automatische Datenaktualisierung
 
 on:
   schedule:
-    - cron: "*/240 * * * *"  # Alle 5 Minuten ausführen
+    - cron: "0 */4 * * *"  # Alle 5 Minuten ausführen
   workflow_dispatch:  # Erlaubt manuelles Starten über GitHub UI
 
 jobs:
@@ -30,6 +30,9 @@ jobs:
 
       - name: JSON in CSV konvertieren
         run: python 2_csv.py
+
+      - name: streamlit updaten
+        run: python app.py
 
       - name: Änderungen committen und pushen
         run: |
