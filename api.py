@@ -21,7 +21,7 @@ api_url = api_url_template.format(start=vor_sechs_tagen, end=morgen)
 print("API-Link:", api_url)
 
 # API URL (mit deinem spezifischen Parameter)
-url = "https://api.opensensorweb.de/v1/organizations/pikobytes/networks/bafg/devices/5952025/sensors/w/measurements/raw?start=2025-02-12T00:00:00%2B01:00&end=2025-02-19T22:59:59%2B01:00&interpolator=LINEAR"
+url = api_url
 
 # Anfrage an die API
 response = requests.get(url)
