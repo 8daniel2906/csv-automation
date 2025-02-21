@@ -41,7 +41,7 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git add sensor_data.json sensor_data.csv
+          git add sensor_data.json sensor_data.csv historic_data.npy historic_predictions.npy error.npy mean_error.npy max_global-error.npy timestamps.npy
           git commit -m "🔄 Automatische Aktualisierung der Sensordaten" || echo "Keine Änderungen zum Commit"
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/8daniel2906/csv-automation.git main
 
