@@ -32,7 +32,7 @@ jobs:
         run: python 2_csv.py
 
       - name: vorhersage berechnen
-        run: csv_2_numpy.py
+        run: python csv_2_numpy.py
 
       - name: streamlit updaten
         run: python app.py
