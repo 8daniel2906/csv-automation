@@ -111,7 +111,8 @@ temp_arr = []
 historic_prediction = []
 historic_prediction_temp = []
 historic_prediction_full = []
-range_loop = 14 if datetime.now().hour < 12 else 15
+#range_loop = 14 if datetime.now().hour < 12 else 15
+range_loop = 15
 for i in range(range_loop):
     historic_datum = array[(12 * i) * 60 , :9].reshape(9,)
     historic_stand = array[(12 * i) * 60 : ((12 * i) + 15) * 60 , 9].reshape(900,) # refer to onenote skizze
@@ -133,7 +134,7 @@ for i in range(range_loop):
 
 print(historic_prediction_full.shape)
 
-historic_input_full = array[15 * 60 : 15 * 60 + 24 * 60 * 7, 9]
+historic_input_full = array[15 * 60 : 15 * 60 + 12 * 60 * range_loop, 9]
 print(historic_input_full.shape)
 
 fehler_array = np.abs(historic_prediction_full - historic_input_full)
