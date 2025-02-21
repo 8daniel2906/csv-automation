@@ -19,7 +19,7 @@ jobs:
 
       - name: Abhängigkeiten installieren
         run: |
-          pip install requests pyyaml streamlit pandas matplotlib
+          pip install requests pyyaml streamlit pandas matplotlib plotly
 
       - name: Alte JSON- und CSV-Dateien löschen
         run: |
