@@ -2,6 +2,7 @@ import pandas as pd
 import tensorflow as tf
 from tensorflow.keras.losses import MeanSquaredError
 import numpy as np
+from datetime import datetime
 # CSV einlesen
 df = pd.read_csv("sensor_data.csv", delimiter=",", names=["Zeit", "Wert"], skiprows=1)
 
@@ -21,11 +22,11 @@ df["Wert"] = df["Wert"].interpolate(method="linear")
 # Zeitspalte entfernen und Spalten neu anordnen
 df = df.drop(columns=["Zeit"])[["Jahr", "Monat", "Tag", "Stunde", "Minute", "Wert"]]
 
-jahr1 = int(df.iloc[0]['Jahr'])
-monat1 = int(df.iloc[0]['Monat'])
-tag1 = int(df.iloc[0]['Tag'])
-stunde1 = int(df.iloc[0]['Stunde'])
-minute1 = int(df.iloc[0]['Minute'])
+jahr1 = int(df.iloc[900]['Jahr'])
+monat1 = int(df.iloc[900]['Monat'])
+tag1 = int(df.iloc[900]['Tag'])
+stunde1 = int(df.iloc[900]['Stunde'])
+minute1 = int(df.iloc[900]['Minute'])
 
 jahr2 = int(df.iloc[-900]['Jahr'])
 monat2 = int(df.iloc[-900]['Monat'])
@@ -110,7 +111,8 @@ temp_arr = []
 historic_prediction = []
 historic_prediction_temp = []
 historic_prediction_full = []
-for i in range(14):
+range_loop = 14 if datetime.now().hour < 12 else 15
+for i in range(range_loop):
     historic_datum = array[(12 * i) * 60 , :9].reshape(9,)
     historic_stand = array[(12 * i) * 60 : ((12 * i) + 15) * 60 , 9].reshape(900,) # refer to onenote skizze
     temp_arr = np.concatenate((historic_datum, historic_stand))
