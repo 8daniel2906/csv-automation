@@ -1,118 +1,87 @@
 import pandas as pd
 import tensorflow as tf
 from tensorflow.keras.losses import MeanSquaredError
-
-
-
-
-
+import numpy as np
 # CSV einlesen
 df = pd.read_csv("sensor_data.csv", delimiter=",", names=["Zeit", "Wert"], skiprows=1)
 
-# Zeitspalte in Datetime umwandeln
+# Zeitspalte in Datetime umwandeln und neue Zeitspalten extrahieren
 df["Zeit"] = pd.to_datetime(df["Zeit"])
+df[["Jahr", "Monat", "Tag", "Stunde", "Minute"]] = df["Zeit"].apply(lambda x: [x.year, x.month, x.day, x.hour, x.minute]).apply(pd.Series)
 
-# Neue Spalten für Jahr, Monat, Tag, Stunde, Minute hinzufügen
-df["Jahr"] = df["Zeit"].dt.year
-df["Monat"] = df["Zeit"].dt.month
-df["Tag"] = df["Zeit"].dt.day
-df["Stunde"] = df["Zeit"].dt.hour
-df["Minute"] = df["Zeit"].dt.minute
+# Vollständige Zeitreihe erstellen
+full_time_index = pd.date_range(df["Zeit"].min(), df["Zeit"].max(), freq="T")
+df_full = pd.DataFrame({"Zeit": full_time_index})
+df_full[["Jahr", "Monat", "Tag", "Stunde", "Minute"]] = df_full["Zeit"].apply(lambda x: [x.year, x.month, x.day, x.hour, x.minute]).apply(pd.Series)
 
-# Unnötige Zeitspalte entfernen
-df.drop(columns=["Zeit"], inplace=True)
-
-# Spalten neu anordnen, sodass "Wert" die letzte Spalte ist
-df = df[["Jahr", "Monat", "Tag", "Stunde", "Minute", "Wert"]]
-
-# Fehlende Zeitwerte ergänzen und interpolieren
-start_time = df.iloc[0][["Jahr", "Monat", "Tag", "Stunde", "Minute"]].tolist()
-end_time = df.iloc[-1][["Jahr", "Monat", "Tag", "Stunde", "Minute"]].tolist()
-full_time_index = pd.date_range(
-    start=f"{start_time[0]}-{start_time[1]:02d}-{start_time[2]:02d} {start_time[3]:02d}:{start_time[4]:02d}",
-    end=f"{end_time[0]}-{end_time[1]:02d}-{end_time[2]:02d} {end_time[3]:02d}:{end_time[4]:02d}",
-    freq="T"
-)
-
-# Erstelle einen neuen DataFrame mit der vollständigen Zeitreihe
-df_full = pd.DataFrame(
-    [(t.year, t.month, t.day, t.hour, t.minute) for t in full_time_index],
-    columns=["Jahr", "Monat", "Tag", "Stunde", "Minute"]
-)
-
-# Werte mit ursprünglichem DataFrame zusammenführen und fehlende Werte interpolieren
-df = df_full.merge(df, on=["Jahr", "Monat", "Tag", "Stunde", "Minute"], how="left")
+# Originalwerte einfügen und interpolieren
+df = df_full.merge(df.drop(columns=["Zeit"]), on=["Jahr", "Monat", "Tag", "Stunde", "Minute"], how="left")
 df["Wert"] = df["Wert"].interpolate(method="linear")
 
+# Zeitspalte entfernen und Spalten neu anordnen
+df = df.drop(columns=["Zeit"])[["Jahr", "Monat", "Tag", "Stunde", "Minute", "Wert"]]
+
 # Letzte 900 Zeilen auswählen
-df_last_900 = df.tail(900)
+#print(df.head(900))
+#print(df_last_900.head())
 
-import numpy as np
+def df_to_numpy(df):
+    # Jahr - 200 und durch 1000 teilen
+    df['Jahr'] = (df['Jahr'] - 2000) / 1000.0
 
-#numpy_array = df_last_900.to_numpy()
+    # Monat zyklisch in Sinus und Kosinus umwandeln
+    df['Monat_sin'] = np.sin(2 * np.pi * df['Monat'] / 12)
+    df['Monat_cos'] = np.cos(2 * np.pi * df['Monat'] / 12)
 
+    # Tag zyklisch in Sinus und Kosinus umwandeln
+    df['Tag_sin'] = np.sin(2 * np.pi * df['Tag'] / 31)
+    df['Tag_cos'] = np.cos(2 * np.pi * df['Tag'] / 31)
 
-def transform_and_append(df):
-    # Nehme die erste Zeile aus den 900
-    first_row = df.iloc[0]
+    # Stunde zyklisch in Sinus und Kosinus umwandeln
+    df['Stunde_sin'] = np.sin(2 * np.pi * df['Stunde'] / 24)
+    df['Stunde_cos'] = np.cos(2 * np.pi * df['Stunde'] / 24)
 
-    # Extrahiere Jahr, Monat, Tag, Stunde, Minute
-    year = first_row["Jahr"] - 2000
-    year = year / 1000
-    month = first_row["Monat"]
-    day = first_row["Tag"]
-    hour = first_row["Stunde"]
-    minute = first_row["Minute"]
+    # Minute zyklisch in Sinus und Kosinus umwandeln
+    df['Minute_sin'] = np.sin(2 * np.pi * df['Minute'] / 60)
+    df['Minute_cos'] = np.cos(2 * np.pi * df['Minute'] / 60)
 
-    # Zyklische Sin/Cos-Transformation
-    month_sin = np.sin(2 * np.pi * month / 12)
-    month_cos = np.cos(2 * np.pi * month / 12)
+    # Wert durch 1000 teilen
+    df['Wert'] = df['Wert'] / 1000.0
 
-    day_sin = np.sin(2 * np.pi * day / 31)
-    day_cos = np.cos(2 * np.pi * day / 31)
+    # Die relevanten Spalten in der gewünschten Reihenfolge
+    df_transformed = df[['Jahr', 'Monat_sin', 'Monat_cos', 'Tag_sin', 'Tag_cos',
+                         'Stunde_sin', 'Stunde_cos', 'Minute_sin', 'Minute_cos', 'Wert']]
 
-    hour_sin = np.sin(2 * np.pi * hour / 24)
-    hour_cos = np.cos(2 * np.pi * hour / 24)
-
-    minute_sin = np.sin(2 * np.pi * minute / 60)
-    minute_cos = np.cos(2 * np.pi * minute / 60)
-
-    # Erstelle ein Array mit den 9 Datenpunkten
-    transformed_data = np.array([
-        year, month_sin, month_cos, day_sin, day_cos, hour_sin, hour_cos, minute_sin, minute_cos
-    ])
-
-    # Werte der 900 Zeilen als Numpy-Array
-    values = df["Wert"].to_numpy() / 1000
-
-    # Kombiniere die 9 Features mit den 900 Werten zu einem 909-Array
-    result_array = np.concatenate([transformed_data, values])
-
-    return result_array
+    # Numpy-Array erstellen
+    return df_transformed.to_numpy()
 
 
-# Die letzten 900 Zeilen nehmen und die Funktion anwenden
-final_array_for_model_input = transform_and_append(df_last_900)
-final_array_for_input_plot = final_array_for_model_input[9:]
+array = df_to_numpy(df)
 
+# Ausgabe des Numpy-Arrays
+print(array.shape)
 model = tf.keras.models.load_model(
     "fnn_v2.h5",
     custom_objects={"mse": MeanSquaredError()}
 )
-next_prediction = model.predict(final_array_for_model_input.reshape(1, -1), verbose=0).reshape(180,)
 
-print(final_array_for_input_plot.reshape(900,).shape)
-print(next_prediction.shape)
 arr = []
-arr = np.concatenate([final_array_for_input_plot, next_prediction ])
-#np.save("test", final_array_for_model_input)
-import matplotlib.pyplot as plt
+input_datum = array[-900, :9].reshape(9,)
+input_stand = array[-900:, 9].reshape(900,)
+input = np.concatenate((input_datum, input_stand))#(909,)
 
-# Plotten des Arrays
-plt.figure(figsize=(10, 6))  # Optional: Größe des Plots anpassen
-plt.plot(arr * 1000)
-plt.title('Plot der 1080 Werte')
-plt.xlabel('Index')
-plt.ylabel('Wert')
-plt.grid(True)  # Optional: Gitterlinien hinzufügen
-plt.show()
+for i in range(4): # funktioniert nur wenn input größer ist als output
+    next_prediction = model.predict(input.reshape(1, -1), verbose=0).reshape(180, )
+    arr = np.append(arr, next_prediction)
+
+    input = input[9:]
+    input = np.concatenate((input,next_prediction))
+    input = input[180:]
+    input = np.concatenate((array[-900+(i+1)*180, :9].reshape(9,),input)) #wegen der zeile wird das nicht unendlich autoregressiv laufen, dafür gehen die 9 datumswerte aus
+
+print(arr.shape)
+
+
+#arr = np.concatenate([input_stand, arr ])
+np.save("input", input_stand * 1000)
+np.save("live_prediction", arr * 1000)

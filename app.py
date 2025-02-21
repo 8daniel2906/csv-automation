@@ -1,57 +1,30 @@
 import streamlit as st
-import pandas as pd
-import matplotlib.pyplot as plt
-import requests
+import numpy as np
+import plotly.graph_objects as go
 
-# Raw-Link zur CSV-Datei
-csv_url = "https://raw.githubusercontent.com/8daniel2906/csv-automation/main/sensor_data.csv"
+# Beispiel: Zwei np.arrays laden
+# Ersetze dies durch den Pfad zu deinen eigenen .npy Dateien
+array_blue = np.load('input.npy')
+array_red = np.load('live_prediction.npy')
 
+# Erstelle eine leere Figure
+fig = go.Figure()
 
-# Lade die CSV-Datei und überprüfe den Status
-response = requests.get(csv_url)
+# Füge das erste Array (blaue Linie) hinzu
+fig.add_trace(go.Scatter(x=np.arange(len(array_blue)), y=array_blue, mode='lines', name='Blau', line=dict(color='blue')))
 
-if response.status_code == 200:
-    st.text("CSV-Datei erfolgreich geladen!")
-    st.code(response.text[:500])  # Zeigt die ersten 500 Zeichen der Datei an
-else:
-    st.error(f"Fehler beim Laden der Datei: {response.status_code}")
+# Füge das zweite Array (rote Linie) hinzu, wobei der x-Wert für die rote Linie angepasst wird
+fig.add_trace(go.Scatter(x=np.arange(len(array_blue), len(array_blue) + len(array_red)),
+                         y=array_red, mode='lines', name='Rot', line=dict(color='red')))
 
-# Streamlit App-Titel
-st.title("Live TEST CSV-Plot aus GitHub")
+# Achsentitel und Layout
+fig.update_layout(
+    title='Interaktives Plot mit zwei Arrays hintereinander',
+    xaxis_title='Index',
+    yaxis_title='Wert',
+    dragmode='zoom',  # Ermöglicht das Strecken/Verkürzen der Achsen
+    showlegend=True
+)
 
-@st.cache_data
-def load_data(csv_url):
-    # Lade die CSV-Datei von der Raw-URL
-    return pd.read_csv(csv_url, delimiter=",", names=["Zeit", "Wert"], skiprows=1)
-
-# Lade die Daten
-df = load_data(csv_url)
-
-# Zeitspalte in Datetime umwandeln
-df["Zeit"] = pd.to_datetime(df["Zeit"])
-
-# Setze den Zeitstempel als Index
-df.set_index("Zeit", inplace=True)
-
-# Generiere eine vollständige Zeitreihe für alle Minuten im gewünschten Bereich
-start_time = df.index.min()
-end_time = df.index.max()
-full_time_index = pd.date_range(start=start_time, end=end_time, freq="T")
-
-# Reindexiere den DataFrame, um alle Minuten abzudecken
-df = df.reindex(full_time_index)
-
-# Führe die lineare Interpolation für fehlende Werte durch
-df["Wert"] = df["Wert"].interpolate(method="linear")
-
-# Plot erstellen
-fig, ax = plt.subplots(figsize=(10, 5))
-ax.plot(df.index, df["Wert"], marker="o", linestyle="-")
-ax.set_xlabel("Zeit")
-ax.set_ylabel("Wert")
-ax.set_title("Werte über Zeit (mit Interpolation)")
-ax.grid(True)
-plt.xticks(rotation=45)
-
-# Den Plot in Streamlit anzeigen
-st.pyplot(fig)
+# Zeige das Plot in Streamlit an
+st.plotly_chart(fig)
