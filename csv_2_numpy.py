@@ -21,6 +21,30 @@ df["Wert"] = df["Wert"].interpolate(method="linear")
 # Zeitspalte entfernen und Spalten neu anordnen
 df = df.drop(columns=["Zeit"])[["Jahr", "Monat", "Tag", "Stunde", "Minute", "Wert"]]
 
+jahr1 = int(df.iloc[0]['Jahr'])
+monat1 = int(df.iloc[0]['Monat'])
+tag1 = int(df.iloc[0]['Tag'])
+stunde1 = int(df.iloc[0]['Stunde'])
+minute1 = int(df.iloc[0]['Minute'])
+
+jahr2 = int(df.iloc[-900]['Jahr'])
+monat2 = int(df.iloc[-900]['Monat'])
+tag2 = int(df.iloc[-900]['Tag'])
+stunde2 = int(df.iloc[-900]['Stunde'])
+minute2 = int(df.iloc[-900]['Minute'])
+
+# Datum der ersten Zeile extrahieren
+timestamp_first = pd.to_datetime(f"{jahr1}-{monat1}-{tag1} {stunde1}:{minute1}")
+timestamp_900th_last = pd.to_datetime(f"{jahr2}-{monat2}-{tag2} {stunde2}:{minute2}")
+print(timestamp_first)
+print(timestamp_900th_last)
+# Packe die Timestamps in ein Array
+timestamps_array = np.array([timestamp_first, timestamp_900th_last])
+print(timestamps_array)
+np.save("timestamps", timestamps_array)
+
+
+
 # Letzte 900 Zeilen auswählen
 #print(df.head(900))
 #print(df_last_900.head())
@@ -57,14 +81,12 @@ def df_to_numpy(df):
 
 
 array = df_to_numpy(df)
-
 # Ausgabe des Numpy-Arrays
 print(array.shape)
 model = tf.keras.models.load_model(
     "fnn_v2.h5",
     custom_objects={"mse": MeanSquaredError()}
 )
-
 arr = []
 input_datum = array[-900, :9].reshape(9,)
 input_stand = array[-900:, 9].reshape(900,)
@@ -79,9 +101,62 @@ for i in range(4): # funktioniert nur wenn input größer ist als output
     input = input[180:]
     input = np.concatenate((array[-900+(i+1)*180, :9].reshape(9,),input)) #wegen der zeile wird das nicht unendlich autoregressiv laufen, dafür gehen die 9 datumswerte aus
 
-print(arr.shape)
-
-
+#print(arr.shape)
 #arr = np.concatenate([input_stand, arr ])
 np.save("input", input_stand * 1000)
 np.save("live_prediction", arr * 1000)
+
+temp_arr = []
+historic_prediction = []
+historic_prediction_temp = []
+historic_prediction_full = []
+for i in range(14):
+    historic_datum = array[(12 * i) * 60 , :9].reshape(9,)
+    historic_stand = array[(12 * i) * 60 : ((12 * i) + 15) * 60 , 9].reshape(900,) # refer to onenote skizze
+    temp_arr = np.concatenate((historic_datum, historic_stand))
+
+    historic_prediction = []
+    for j in range(4):
+        historic_prediction_temp = model.predict(temp_arr.reshape(1, -1), verbose=0).reshape(180, )
+        historic_prediction = np.append(historic_prediction, historic_prediction_temp)
+
+
+        temp_arr = temp_arr[9:]
+        temp_arr = np.concatenate((temp_arr, historic_prediction_temp))
+        temp_arr = temp_arr[180:]
+        temp_arr = np.concatenate((array[(12 * i) * 60 + (j + 1) * 180, :9].reshape(9, ), temp_arr))
+
+    historic_prediction_full = np.append(historic_prediction_full, historic_prediction)
+    #print(historic_prediction_full.shape)
+
+print(historic_prediction_full.shape)
+
+historic_input_full = array[15 * 60 : 15 * 60 + 24 * 60 * 7, 9]
+print(historic_input_full.shape)
+
+fehler_array = np.abs(historic_prediction_full - historic_input_full)
+
+import matplotlib.pyplot as plt
+
+# Beispielarray mit 15120 Elementen (hier einfach eine Zahlenreihe von 0 bis 15119)
+data = list(range(15120))
+
+# Plot erstellen
+plt.figure(figsize=(10, 4))
+plt.plot(historic_prediction_full * 1000, linewidth=0.5)
+plt.plot(historic_input_full * 1000, linewidth=0.5)
+plt.plot(fehler_array * 1000, linewidth=0.5)
+plt.plot(np.zeros(10080), linewidth=0.5)
+plt.plot(np.full(10080, np.mean(fehler_array * 1000)), linewidth=0.5)
+plt.plot(np.full(10080, np.max(fehler_array * 1000)), linewidth=0.5)
+plt.title("Plot des Arrays")
+
+plt.show()
+
+np.save("historic_data", historic_input_full * 1000)
+np.save("historic_predictions", historic_prediction_full * 1000)
+np.save("error", fehler_array * 1000)
+np.save("mean_error",np.full(10080, np.mean(fehler_array * 1000)) )
+np.save("max_global_error",np.full(10080, np.max(fehler_array * 1000)) )
+
+
