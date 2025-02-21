@@ -21,15 +21,18 @@ jobs:
         run: |
           pip install requests pyyaml streamlit pandas matplotlib plotly
 
-      - name: Alte JSON- und CSV-Dateien löschen
+      - name: Alte JSON- , .npy- und CSV-Dateien löschen
         run: |
-          rm -f sensor_data.json sensor_data.csv
+          rm -f sensor_data.json sensor_data.csv historic_data.npy historic_predictions.npy error.npy mean_error.npy max_global-error.npy timestamps.npy
 
       - name: API-Daten abrufen
         run: python api.py
 
       - name: JSON in CSV konvertieren
         run: python 2_csv.py
+
+      - name: vorhersage berechnen
+        run: csv_2_numpy.py
 
       - name: streamlit updaten
         run: python app.py
