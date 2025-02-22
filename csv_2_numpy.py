@@ -37,11 +37,11 @@ minute2 = int(df.iloc[-900]['Minute'])
 # Datum der ersten Zeile extrahieren
 timestamp_first = pd.to_datetime(f"{jahr1}-{monat1}-{tag1} {stunde1}:{minute1}")
 timestamp_900th_last = pd.to_datetime(f"{jahr2}-{monat2}-{tag2} {stunde2}:{minute2}")
-print(timestamp_first)
-print(timestamp_900th_last)
+#print(timestamp_first)
+#print(timestamp_900th_last)
 # Packe die Timestamps in ein Array
 timestamps_array = np.array([timestamp_first, timestamp_900th_last])
-print(timestamps_array)
+#print(timestamps_array)
 np.save("timestamps", timestamps_array)
 
 
@@ -111,7 +111,7 @@ temp_arr = []
 historic_prediction = []
 historic_prediction_temp = []
 historic_prediction_full = []
-range_loop = 15 if datetime.now().hour < 12 else 16
+range_loop = 14 if datetime.now().hour < 12 else 15
 
 
 cut_off_var = array.shape[0] - 12 * 60 * 15 - 900

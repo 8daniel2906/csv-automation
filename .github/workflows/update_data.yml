@@ -2,7 +2,7 @@ name: Automatische Datenaktualisierung
 
 on:
   schedule:
-    - cron: "0 */4 * * *"  # Alle 5 Minuten ausführen
+    - cron: "0 */4 * * *"  
   workflow_dispatch:  # Erlaubt manuelles Starten über GitHub UI
 
 jobs:
