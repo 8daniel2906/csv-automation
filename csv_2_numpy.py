@@ -111,7 +111,7 @@ temp_arr = []
 historic_prediction = []
 historic_prediction_temp = []
 historic_prediction_full = []
-range_loop = 14 if datetime.now().hour < 12 else 15
+range_loop = 15 if datetime.now().hour < 12 else 16
 
 
 cut_off_var = array.shape[0] - 12 * 60 * 14 - 900
