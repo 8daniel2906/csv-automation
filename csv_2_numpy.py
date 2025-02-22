@@ -114,7 +114,7 @@ historic_prediction_full = []
 range_loop = 15 if datetime.now().hour < 12 else 16
 
 
-cut_off_var = array.shape[0] - 12 * 60 * 14 - 900
+cut_off_var = array.shape[0] - 12 * 60 * (range_loop-1) - 900
 print(cut_off_var)
 #range_loop = 15
 for i in range(range_loop):
