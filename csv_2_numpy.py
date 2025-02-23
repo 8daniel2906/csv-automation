@@ -5,7 +5,7 @@ import numpy as np
 from datetime import datetime
 # CSV einlesen
 df = pd.read_csv("sensor_data.csv", delimiter=",", names=["Zeit", "Wert"], skiprows=1)
-
+df = df[df["Wert"] != 0]
 # Zeitspalte in Datetime umwandeln und neue Zeitspalten extrahieren
 df["Zeit"] = pd.to_datetime(df["Zeit"])
 df[["Jahr", "Monat", "Tag", "Stunde", "Minute"]] = df["Zeit"].apply(lambda x: [x.year, x.month, x.day, x.hour, x.minute]).apply(pd.Series)
