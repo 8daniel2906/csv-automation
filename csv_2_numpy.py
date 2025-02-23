@@ -168,4 +168,4 @@ np.save("error", fehler_array * 1000)
 np.save("mean_error",np.full(10080, np.mean(fehler_array * 1000)) )
 np.save("max_global_error",np.full(10080, np.max(fehler_array * 1000)) )
 
-
+np.save("test_arr", array )
