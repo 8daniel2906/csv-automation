@@ -85,7 +85,7 @@ array = df_to_numpy(df)
 # Ausgabe des Numpy-Arrays
 print(array.shape)
 model = tf.keras.models.load_model(
-    "fnn_v2.h5",
+    "fnn.h5",
     custom_objects={"mse": MeanSquaredError()}
 )
 arr = []
