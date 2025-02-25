@@ -9,7 +9,7 @@ jetzt = datetime.now()
 morgen = (jetzt + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
 
 # Zweiter Zeitpunkt: Vor 8 Tagen um 09:00 Uhr
-vor_sechs_tagen = (jetzt - timedelta(days=8)).replace(hour=9, minute=0, second=0, microsecond=0).isoformat()
+vor_sechs_tagen = (jetzt - timedelta(days=8)).replace(hour=11, minute=0, second=0, microsecond=0).isoformat()
 
 # API-Link mit Platzhaltern
 api_url_template = "https://api.opensensorweb.de/v1/organizations/pikobytes/networks/bafg/devices/5952025/sensors/w/measurements/raw?start={start}%2B01:00&end={end}%2B01:00&interpolator=LINEAR"
