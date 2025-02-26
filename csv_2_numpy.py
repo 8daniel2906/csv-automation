@@ -22,17 +22,17 @@ df["Wert"] = df["Wert"].interpolate(method="linear")
 # Zeitspalte entfernen und Spalten neu anordnen
 df = df.drop(columns=["Zeit"])[["Jahr", "Monat", "Tag", "Stunde", "Minute", "Wert"]]
 
-jahr1 = int(df.iloc[780]['Jahr'])
-monat1 = int(df.iloc[780]['Monat'])
-tag1 = int(df.iloc[780]['Tag'])
-stunde1 = int(df.iloc[780]['Stunde'])
-minute1 = int(df.iloc[780]['Minute'])
+jahr1 = int(df.iloc[840]['Jahr'])
+monat1 = int(df.iloc[840]['Monat'])
+tag1 = int(df.iloc[840]['Tag'])
+stunde1 = int(df.iloc[840]['Stunde'])
+minute1 = int(df.iloc[840]['Minute'])
 
-jahr2 = int(df.iloc[-780]['Jahr'])
-monat2 = int(df.iloc[-780]['Monat'])
-tag2 = int(df.iloc[-780]['Tag'])
-stunde2 = int(df.iloc[-780]['Stunde'])
-minute2 = int(df.iloc[-780]['Minute'])
+jahr2 = int(df.iloc[-840]['Jahr'])
+monat2 = int(df.iloc[-840]['Monat'])
+tag2 = int(df.iloc[-840]['Tag'])
+stunde2 = int(df.iloc[-840]['Stunde'])
+minute2 = int(df.iloc[-840]['Minute'])
 
 # Datum der ersten Zeile extrahieren
 timestamp_first = pd.to_datetime(f"{jahr1}-{monat1}-{tag1} {stunde1}:{minute1}")
@@ -102,18 +102,18 @@ model = tf.keras.models.load_model(
     custom_objects={"mse": MeanSquaredError()}
 )
 arr = []
-input_datum = array[-780, :12].reshape(12,)
-input_stand = array[-780:, 12].reshape(780,)
+input_datum = array[-840, :12].reshape(12,)
+input_stand = array[-840:, 12].reshape(840,)
 input = np.concatenate((input_datum, input_stand))#(909,)
 
 for i in range(1): # funktioniert nur wenn input größer ist als output
-    next_prediction = model.predict(input.reshape(1, -1), verbose=0).reshape(720, )
+    next_prediction = model.predict(input.reshape(1, -1), verbose=0).reshape(360, )
     arr = np.append(arr, next_prediction)
 
     input = input[12:]
     input = np.concatenate((input,next_prediction))
-    input = input[720:]
-    input = np.concatenate((array[-780+(i+1)*720, :12].reshape(12,),input)) #wegen der zeile wird das nicht unendlich autoregressiv laufen, dafür gehen die 9 datumswerte aus
+    input = input[360:]
+    input = np.concatenate((array[-840+(i+1)*360, :12].reshape(12,),input)) #wegen der zeile wird das nicht unendlich autoregressiv laufen, dafür gehen die 9 datumswerte aus
 
 #print(arr.shape)
 #arr = np.concatenate([input_stand, arr ])
@@ -127,30 +127,30 @@ historic_prediction_full = []
 range_loop = 15 if datetime.now().hour < 12 else 16
 
 
-cut_off_var = array.shape[0] - 12 * 60 * (range_loop-1) - 780
+cut_off_var = array.shape[0] - 12 * 60 * (range_loop-1) - 840
 print(cut_off_var)
 #range_loop = 1
 for i in range(range_loop):
     historic_datum = array[(12 * i) * 60 , :12].reshape(12,)
-    historic_stand = array[(12 * i) * 60 : ((12 * i) + 13) * 60 , 12].reshape(780,) # refer to onenote skizze
+    historic_stand = array[(12 * i) * 60 : ((12 * i) + 14) * 60 , 12].reshape(840,) # refer to onenote skizze
     temp_arr = np.concatenate((historic_datum, historic_stand))
     print(historic_datum.shape)
     print(historic_stand.shape)
 
 
     historic_prediction = []
-    for j in range(1):
-        historic_prediction_temp = model.predict(temp_arr.reshape(1, -1), verbose=0).reshape(720, )
-        print(historic_prediction_temp.shape)
+    for j in range(2):
+        historic_prediction_temp = model.predict(temp_arr.reshape(1, -1), verbose=0).reshape(360, )
+        #print(historic_prediction_temp.shape)
         historic_prediction = np.append(historic_prediction, historic_prediction_temp)
-        print(historic_prediction.shape)
+        #print(historic_prediction.shape)
 
 
-        #temp_arr = temp_arr[12:]
-        #temp_arr = np.concatenate((temp_arr, historic_prediction_temp))
-        #temp_arr = temp_arr[720:]
-        #temp_arr = np.concatenate((array[(12 * i) * 60 + (j + 1) * 720, :12].reshape(12, ), temp_arr))
-        #print(temp_arr.shape)
+        temp_arr = temp_arr[12:]
+        temp_arr = np.concatenate((temp_arr, historic_prediction_temp))
+        temp_arr = temp_arr[360:]
+        temp_arr = np.concatenate((array[(12 * i) * 60 + (j + 1) * 360, :12].reshape(12, ), temp_arr))
+        print(temp_arr.shape)
 
     historic_prediction_full = np.append(historic_prediction_full, historic_prediction)
 print(len(historic_prediction_full))
@@ -158,8 +158,8 @@ historic_prediction_full = historic_prediction_full[:(len(historic_prediction_fu
 #print(historic_prediction_full.shape)
 
 
-print(array[13 * 60 : 13 * 60 + 12 * 60 * range_loop , 12].shape)
-historic_input_full = array[13 * 60 : 13 * 60 + 12 * 60 * range_loop , 12]
+print(array[14 * 60 : 14 * 60 + 12 * 60 * range_loop , 12].shape)
+historic_input_full = array[14 * 60 : 14 * 60 + 12 * 60 * range_loop , 12]
 print(historic_input_full.shape)
 
 fehler_array = np.abs(historic_prediction_full - historic_input_full)
