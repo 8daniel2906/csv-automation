@@ -16,7 +16,7 @@ datetime_str = st.text_input("Gib das Startdatum & Uhrzeit ein (Format: YYYY-MM-
 try:
     start_datetime = pd.to_datetime(datetime_str, format="%Y-%m-%d %H:%M")
 except ValueError:
-    st.error("❌ Falsches Format! Bitte nutze YYYY-MM-DD HH:MM (z. B. 2024-02-21 14:30).")
+    st.error(" Falsches Format! Bitte nutze YYYY-MM-DD HH:MM (z. B. 2024-02-21 14:30).")
     st.stop()
 
 # Beispiel: Zwei np.arrays laden
@@ -31,8 +31,8 @@ time_red = pd.date_range(start=time_blue[-1] + pd.Timedelta(minutes=1), periods=
 # Erster Plot: Zwei Arrays hintereinander
 fig1 = go.Figure()
 
-fig1.add_trace(go.Scatter(x=time_blue, y=array_blue, mode='lines', name='Blau', line=dict(color='blue')))
-fig1.add_trace(go.Scatter(x=time_red, y=array_red, mode='lines', name='Rot', line=dict(color='red')))
+fig1.add_trace(go.Scatter(x=time_blue, y=array_blue, mode='lines', name='Wasserstand_der_letzten_Stunden', line=dict(color='blue')))
+fig1.add_trace(go.Scatter(x=time_red, y=array_red, mode='lines', name='Vorhersage', line=dict(color='red')))
 
 fig1.update_layout(
     title='Interaktives Zeit-Plot mit zwei Arrays',
@@ -58,9 +58,9 @@ except ValueError:
     st.stop()
 
 # Laden der fünf neuen Arrays für den zweiten Plot
-array_1 = np.load('historic_data.npy')
-array_2 = np.load('historic_predictions.npy')
-array_3 = np.load('error.npy')
+Wasserstand_der_letzten_Woche = np.load('historic_data.npy')
+zwölfstündige_Vorhersagen = np.load('historic_predictions.npy')
+Fehler_pro_Messung = np.load('error.npy')
 array_4 = np.load('mean_error.npy')
 array_5 = np.load('max_global_error.npy')
 

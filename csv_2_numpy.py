@@ -106,7 +106,7 @@ input_datum = array[-840, :12].reshape(12,)
 input_stand = array[-840:, 12].reshape(840,)
 input = np.concatenate((input_datum, input_stand))#(909,)
 
-for i in range(1): # funktioniert nur wenn input größer ist als output
+for i in range(2): # funktioniert nur wenn input größer ist als output
     next_prediction = model.predict(input.reshape(1, -1), verbose=0).reshape(360, )
     arr = np.append(arr, next_prediction)
 
