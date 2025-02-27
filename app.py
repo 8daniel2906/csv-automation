@@ -10,23 +10,24 @@ first_timestamp = pd.to_datetime(timestamps_array[1])
 second_timestamp = pd.to_datetime(timestamps_array[0])
 
 # **Manuelle Eingabe des Start-Zeitpunkts als Text**
-datetime_str = st.text_input("Gib das Startdatum & Uhrzeit ein (Format: YYYY-MM-DD HH:MM)", value=first_timestamp.strftime("%Y-%m-%d %H:%M"))
+#datetime_str = st.text_input("w", value=first_timestamp.strftime("%Y-%m-%d %H:%M"))
 
 # **Konvertiere den Text in einen Timestamp**
-try:
-    start_datetime = pd.to_datetime(datetime_str, format="%Y-%m-%d %H:%M")
-except ValueError:
-    st.error(" Falsches Format! Bitte nutze YYYY-MM-DD HH:MM (z. B. 2024-02-21 14:30).")
-    st.stop()
+#try:
+#   start_datetime = pd.to_datetime(datetime_str, format="%Y-%m-%d %H:%M")
+#except ValueError:
+#    st.error(" Falsches Format! Bitte nutze YYYY-MM-DD HH:MM (z. B. 2024-02-21 14:30).")
+#    st.stop()
 
 # Beispiel: Zwei np.arrays laden
 # Ersetze dies durch den Pfad zu deinen eigenen .npy Dateien
 
 array_blue = np.load('input.npy')
 array_red = np.load('live_prediction.npy')
-
+#print(first_timestamp)
+#print(start_datetime)
 # **Zeitstempel für die x-Achse**
-time_blue = pd.date_range(start=start_datetime, periods=len(array_blue), freq='T')
+time_blue = pd.date_range(start=first_timestamp, periods=len(array_blue), freq='T')
 time_red = pd.date_range(start=time_blue[-1] + pd.Timedelta(minutes=1), periods=len(array_red), freq='T')
 # Erster Plot: Zwei Arrays hintereinander
 fig1 = go.Figure()
@@ -49,13 +50,13 @@ st.plotly_chart(fig1)
 st.markdown("---")
 
 # **Manuelle Eingabe für Plot 2**
-datetime_str2 = st.text_input("Gib das Startdatum & Uhrzeit für Plot 2 ein (Format: YYYY-MM-DD HH:MM)", value=second_timestamp.strftime("%Y-%m-%d %H:%M"))
+#datetime_str2 = st.text_input("Gib das Startdatum & Uhrzeit für Plot 2 ein (Format: YYYY-MM-DD HH:MM)", value=second_timestamp.strftime("%Y-%m-%d %H:%M"))
 # **Konvertiere Eingabe in Timestamp für Plot 2**
-try:
-    start_datetime2 = pd.to_datetime(datetime_str2, format="%Y-%m-%d %H:%M")
-except ValueError:
-    st.error("❌ Falsches Format für Plot 2! Bitte nutze YYYY-MM-DD HH:MM.")
-    st.stop()
+#try:
+#    start_datetime2 = pd.to_datetime(datetime_str2, format="%Y-%m-%d %H:%M")
+#except ValueError:
+#    st.error("❌ Falsches Format für Plot 2! Bitte nutze YYYY-MM-DD HH:MM.")
+#    st.stop()
 
 # Laden der fünf neuen Arrays für den zweiten Plot
 Wasserstand_der_letzten_Woche = np.load('historic_data.npy')
@@ -69,7 +70,7 @@ colors = ['purple', 'green', 'orange', 'cyan', 'magenta']
 arrays = [Wasserstand_der_letzten_Woche, zwölfstündige_Vorhersagen, Fehler_pro_Messung, array_4, array_5]
 
 # **Erzeuge Zeitstempel für Plot 2**
-time_steps = [pd.date_range(start=start_datetime2, periods=len(arr), freq='T') for arr in arrays]
+time_steps = [pd.date_range(start=second_timestamp, periods=len(arr), freq='T') for arr in arrays]
 
 # Zweiter Plot: 5 Arrays
 fig2 = go.Figure()
