@@ -58,9 +58,9 @@ for i, (array, time, color) in enumerate(zip(arrays, time_steps, colors)):
     fig2.add_trace(go.Scatter(x=time, y=array, mode='lines', name=f'Array {i+1}', line=dict(color=color)))
 
 fig2.update_layout(
-    title='Interaktives Zeit-Plot 2 mit fünf Arrays',
+    title='Wasserstandvorhersage der letzten Woche',
     xaxis_title='Zeit',
-    yaxis_title='Wert',
+    yaxis_title='Wasserstand in cm',
     xaxis=dict(type='date'),
     dragmode='zoom',
     showlegend=True
