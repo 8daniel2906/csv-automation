@@ -23,7 +23,7 @@ fig1.add_trace(go.Scatter(x=time_blue, y=array_blue, mode='lines', name='Wassers
 fig1.add_trace(go.Scatter(x=time_red, y=array_red, mode='lines', name='Vorhersage der nächsten 12 Stunden', line=dict(color='red')))
 
 fig1.update_layout(
-    title='Interaktives Zeit-Plot mit zwei Arrays',
+    title='Live - Vorhersage',
     xaxis_title='Zeit',
     yaxis_title='Wert',
     xaxis=dict(type='date'),
