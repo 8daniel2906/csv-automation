@@ -40,16 +40,17 @@ st.markdown("---")
 Wasserstand_der_letzten_Woche = np.load('historic_data.npy')
 zwölfstündige_Vorhersagen = np.load('historic_predictions.npy')
 Fehler_pro_Messung = np.load('error.npy')
-array_4 = np.load('mean_error.npy')
-array_5 = np.load('max_global_error.npy')
+array_mean = np.load('mean_error.npy')
+array_max = np.load('max_global_error.npy')
+
 arrays = [Wasserstand_der_letzten_Woche, zwölfstündige_Vorhersagen, Fehler_pro_Messung]
 # **Erzeuge Zeitstempel für Plot 2**
 time_steps = [pd.date_range(start=second_timestamp, periods=len(arr), freq='T') for arr in arrays]
-
+time_1 = pd.date_range(start=second_timestamp, periods=len(Wasserstand_der_letzten_Woche), freq='T')
 # Zweiter Plot: 5 Arrays
 fig2 = go.Figure()
 
-fig2.add_trace(go.Scatter(x=time_steps, y=Wasserstand_der_letzten_Woche, mode='lines', name='Wasserstand der letzten Woche', line=dict(color='purple')))
+fig2.add_trace(go.Scatter(x=time_1, y=Wasserstand_der_letzten_Woche, mode='lines', name='Wasserstand der letzten Woche', line=dict(color='purple')))
 fig2.add_trace(go.Scatter(x=time_steps, y=zwölfstündige_Vorhersagen, mode='lines', name='Vorhersagen', line=dict(color='green')))
 fig2.add_trace(go.Scatter(x=time_steps, y=Fehler_pro_Messung, mode='lines', name='Fehler der Vorhersage', line=dict(color='orange')))
 
