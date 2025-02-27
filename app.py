@@ -50,9 +50,10 @@ fig2 = go.Figure()
 
 fig2.add_trace(go.Scatter(x=time_1, y=Wasserstand_der_letzten_Woche, mode='lines', name='Wasserstand der letzten Woche', line=dict(color='blue')))
 fig2.add_trace(go.Scatter(x=time_1, y=zwölfstündige_Vorhersagen, mode='lines', name='Vorhersage', line=dict(color='red')))
-fig2.add_trace(go.Scatter(x=time_1, y=Fehler_pro_Messung, mode='lines', name='Fehler', line=dict(color='orange')))
-fig2.add_annotation(x=max(time_1),y=array_mean[0],text=f"Ø {array_mean[0]:.2f} durchschnitlicher Vorhersagefehler")
-fig2.add_annotation(x=min(time_1),y=array_max[0],text=f"Ø {array_max[0]:.2f} größter Vorhersagefehler")
+fig2.add_trace(go.Scatter(x=time_1, y=Fehler_pro_Messung, mode='lines',
+                          name=f'Fehler (Ø {array_mean[0]:.2f} durchschnitlicher Vorhersagefehler , max. {array_max[0]:.2f})',
+                          line=dict(color='orange')))
+
 fig2.update_layout(
     title='Wasserstandvorhersage der letzten Woche',
     xaxis_title='Zeit',
