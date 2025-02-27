@@ -55,7 +55,7 @@ fig2 = go.Figure()
 
 
 for i, (array, time, color) in enumerate(zip(arrays, time_steps, colors)):
-    fig2.add_trace(go.Scatter(x=time, y=array, mode='lines', name=f'Array {arrays+1}', line=dict(color=color)))
+    fig2.add_trace(go.Scatter(x=time, y=array, mode='lines', name=f'Array {arrays}', line=dict(color=color)))
 
 fig2.update_layout(
     title='Wasserstandvorhersage der letzten Woche',
