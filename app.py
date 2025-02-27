@@ -55,11 +55,23 @@ fig2.add_trace(go.Scatter(x=time_1, y=Fehler_pro_Messung, mode='lines',
                           name=f'Vorhersagefehler <br>Ø Vorhersagefehler: {array_mean[0]:.2f}cm <br>MAX. Vorhersagefehler: {array_max[0]:.2f}cm',
                           line=dict(color='orange')))
 
+# Hinzufügen eines Range Sliders
 fig2.update_layout(
     title='Wasserstandvorhersage der letzten Woche',
     xaxis_title='Zeit',
     yaxis_title='Wasserstand in cm',
-    xaxis=dict(type='date'),
+    xaxis=dict(
+        type='date',
+        rangeslider=dict(visible=True),  # Range Slider aktivieren
+        rangeselector=dict(
+            buttons=[
+                dict(count=1, label="1T", step="day", stepmode="backward"),
+                dict(count=3, label="3T", step="day", stepmode="backward"),
+                dict(count=7, label="1W", step="day", stepmode="backward"),
+                dict(step="all")
+            ]
+        )
+    ),
     dragmode='zoom',
     showlegend=True
 )
