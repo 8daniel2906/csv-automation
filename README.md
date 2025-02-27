@@ -24,7 +24,7 @@ Zur Vorhersage: https://csv-automation-n4hzumwzdcoefrw3qrq9rs.streamlit.app/
 Eine Live-Demo der Anwendung ist hier verfügbar: [Streamlit Link](https://dein-link.com)
 
 ## ✨ Vorschau
-![Wasserstandsvorhersage-Dashboard]([(https://csv-automation-n4hzumwzdcoefrw3qrq9rs.streamlit.app/)])
+![Wasserstandsvorhersage-Dashboard](https://csv-automation-n4hzumwzdcoefrw3qrq9rs.streamlit.app/)
 
 ## 👥 Autor
 **[by Daniel Christ]**  
