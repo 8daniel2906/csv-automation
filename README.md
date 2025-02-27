@@ -22,7 +22,7 @@ Eine Live-Demo der Anwendung ist hier verfügbar: [Streamlit Link](https://csv-a
 - **Interaktive Visualisierung:** Web-App zur Darstellung der Vorhersagen
 
 ## 👥 Autor
-**[by Daniel Christ]**  
+**by Daniel Christ**  
 Technomathematik-Student mit Interesse an Machine Learning und Data Science.  
 Kontakt: [LinkedIn](https://www.linkedin.com/in/daniel-christ-397555290/)| E-Mail: da.christ@tuhh.de
 
