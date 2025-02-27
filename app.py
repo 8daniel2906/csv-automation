@@ -42,7 +42,7 @@ zwölfstündige_Vorhersagen = np.load('historic_predictions.npy')
 Fehler_pro_Messung = np.load('error.npy')
 array_4 = np.load('mean_error.npy')
 array_5 = np.load('max_global_error.npy')
-
+arrays = [Wasserstand_der_letzten_Woche, zwölfstündige_Vorhersagen, Fehler_pro_Messung]
 # **Erzeuge Zeitstempel für Plot 2**
 time_steps = [pd.date_range(start=second_timestamp, periods=len(arr), freq='T') for arr in arrays]
 
