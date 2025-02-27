@@ -1,8 +1,8 @@
 # Wasserstandsvorhersage mit Machine Learning
 
 ## 🌍 Projektbeschreibung
-Dieses Projekt nutzt Machine Learning zur Vorhersage von Wasserständen basierend auf historischen Daten. 
-Durch den Einsatz eines neuronalen Netzes sollen präzise Prognosen erstellt werden, die für Anwendungen wie Hochwasserschutz oder Wassermanagement nützlich sein können.
+Dieses Projekt nutzt Machine Learning zur Vorhersage von Wasserständen basierend auf historischen Daten. Die herangezogenen Daten stammen aus [opensensorweb.de](https://www.opensensorweb.de/de/data/?c=9.997314%2C53.471824&sid=pikobytes%24bafg%245952025%24w&v=sidebar&z=16.09)
+
 
 ## 📈 Zur Vorhersage: 
 Eine Live-Demo der Anwendung ist hier verfügbar: [Streamlit Link](https://csv-automation-n4hzumwzdcoefrw3qrq9rs.streamlit.app/)
