@@ -25,7 +25,7 @@ fig1.add_trace(go.Scatter(x=time_red, y=array_red, mode='lines', name='Vorhersag
 fig1.update_layout(
     title='Live - Vorhersage',
     xaxis_title='Zeit',
-    yaxis_title='Wert',
+    yaxis_title='Wasserstand in cm',
     xaxis=dict(type='date'),
     dragmode='zoom',
     showlegend=True
@@ -55,7 +55,7 @@ fig2 = go.Figure()
 
 
 for i, (array, time, color) in enumerate(zip(arrays, time_steps, colors)):
-    fig2.add_trace(go.Scatter(x=time, y=array, mode='lines', name=f'Array {i+1}', line=dict(color=color)))
+    fig2.add_trace(go.Scatter(x=time, y=array, mode='lines', name=f'Array {arrays+1}', line=dict(color=color)))
 
 fig2.update_layout(
     title='Wasserstandvorhersage der letzten Woche',
