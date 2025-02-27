@@ -48,7 +48,7 @@ time_1 = pd.date_range(start=second_timestamp, periods=len(Wasserstand_der_letzt
 # Zweiter Plot: 5 Arrays
 fig2 = go.Figure()
 
-fig2.add_trace(go.Scatter(x=time_1, y=Wasserstand_der_letzten_Woche, mode='lines', name='Wasserstand der letzten Woche', line=dict(color='blue)))
+fig2.add_trace(go.Scatter(x=time_1, y=Wasserstand_der_letzten_Woche, mode='lines', name='Wasserstand der letzten Woche', line=dict(color='blue')))
 fig2.add_trace(go.Scatter(x=time_1, y=zwölfstündige_Vorhersagen, mode='lines', name='Wasserstand der letzten Woche', line=dict(color='red')))
 fig2.add_trace(go.Scatter(x=time_1, y=Fehler_pro_Messung, mode='lines', name='Wasserstand der letzten Woche', line=dict(color='orange')))
 
