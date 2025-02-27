@@ -3,6 +3,30 @@ import numpy as np
 import plotly.graph_objects as go
 import pandas as pd
 
+fig = go.Figure()
+
+fig.update_layout(
+    images=[
+        dict(
+            source="https://upload.wikimedia.org/wikipedia/commons/3/3a/Cat03.jpg",  # Ersetze durch deinen Bild-Link
+            x=0,  # Position X
+            y=1,  # Position Y (oben)
+            xref="paper",  # Koordinaten relativ zum Plot-Bereich
+            yref="paper",
+            sizex=0.5,  # Größe in X-Richtung
+            sizey=0.5,  # Größe in Y-Richtung
+            xanchor="left",
+            yanchor="top",
+            layer="below"
+        )
+    ]
+)
+
+fig.show()
+
+
+
+
 timestamps_array = np.load('timestamps.npy', allow_pickle=True)
 
 # **Konvertiere den ersten Timestamp zu einem datetime-Objekt**
