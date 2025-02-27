@@ -8,7 +8,7 @@ jetzt = datetime.now()
 # Erster Zeitpunkt: Morgen um 00:00 Uhr
 morgen = (jetzt + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
 
-# Zweiter Zeitpunkt: Vor 8 Tagen um 09:00 Uhr
+# Zweiter Zeitpunkt: Vor 8 Tagen um 10:00 Uhr, weil letzte 14 stunden
 vor_sechs_tagen = (jetzt - timedelta(days=8)).replace(hour=10, minute=0, second=0, microsecond=0).isoformat()
 
 # API-Link mit Platzhaltern

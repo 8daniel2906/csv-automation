@@ -6,7 +6,7 @@ import pandas as pd
 
 timestamps_array = np.load('timestamps.npy', allow_pickle=True)
 
-# **Konvertiere den ersten Timestamp zu einem datetime-Objekt**
+# Konvertiere den ersten Timestamp zu einem datetime-Objekt
 first_timestamp = pd.to_datetime(timestamps_array[1])
 second_timestamp = pd.to_datetime(timestamps_array[0])
 
@@ -14,7 +14,7 @@ second_timestamp = pd.to_datetime(timestamps_array[0])
 array_blue = np.load('input.npy')
 array_red = np.load('live_prediction.npy')
 
-# **Zeitstempel für die x-Achse**
+# Zeitstempel für die x-Achse
 time_blue = pd.date_range(start=first_timestamp, periods=len(array_blue), freq='T')
 time_red = pd.date_range(start=time_blue[-1] + pd.Timedelta(minutes=1), periods=len(array_red), freq='T')
 # Erster Plot: Zwei Arrays hintereinander
@@ -41,12 +41,12 @@ st.markdown("---")
 Wasserstand_der_letzten_Woche = np.load('historic_data.npy')
 zwölfstündige_Vorhersagen = np.load('historic_predictions.npy')
 Fehler_pro_Messung = np.load('error.npy')
-array_mean = np.load('mean_error.npy')
-array_max = np.load('max_global_error.npy')
+array_mean = np.load('mean_error.npy') #alle werte hier sind identisch
+array_max = np.load('max_global_error.npy')#alle werte hier sind identisch
 
-# **Erzeuge Zeitstempel für Plot 2**
+# Erzeuge Zeitstempel für Plot 2
 time_1 = pd.date_range(start=second_timestamp, periods=len(Wasserstand_der_letzten_Woche), freq='T')
-# Zweiter Plot: 5 Arrays
+
 fig2 = go.Figure()
 
 fig2.add_trace(go.Scatter(x=time_1, y=Wasserstand_der_letzten_Woche, mode='lines', name='Wasserstand der letzten Woche', line=dict(color='blue')))

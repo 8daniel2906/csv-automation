@@ -17,11 +17,11 @@ df_full[["Jahr", "Monat", "Tag", "Stunde", "Minute"]] = df_full["Zeit"].apply(la
 
 # Originalwerte einfügen und interpolieren
 df = df_full.merge(df.drop(columns=["Zeit"]), on=["Jahr", "Monat", "Tag", "Stunde", "Minute"], how="left")
-df["Wert"] = df["Wert"].interpolate(method="linear")
+df["Wert"] = df["Wert"].interpolate(method="linear")#falls werte einfach aus dem sensor fehlen, also man pro minute nicht einen wert hat (passiert in den 2 aktuellsten tagen immer sowieso)
 
 # Zeitspalte entfernen und Spalten neu anordnen
 df = df.drop(columns=["Zeit"])[["Jahr", "Monat", "Tag", "Stunde", "Minute", "Wert"]]
-
+#man macht hier 840 ,weil hier geplottet wird, nicht als input für das modell verwendet wird
 jahr1 = int(df.iloc[840]['Jahr'])
 monat1 = int(df.iloc[840]['Monat'])
 tag1 = int(df.iloc[840]['Tag'])
@@ -36,13 +36,14 @@ minute2 = int(df.iloc[-840]['Minute'])
 
 # Datum der ersten Zeile extrahieren
 timestamp_first = pd.to_datetime(f"{jahr1}-{monat1}-{tag1} {stunde1}:{minute1}")
-timestamp_780th_last = pd.to_datetime(f"{jahr2}-{monat2}-{tag2} {stunde2}:{minute2}")
+timestamp_840th_last = pd.to_datetime(f"{jahr2}-{monat2}-{tag2} {stunde2}:{minute2}")
 
 # Packe die Timestamps in ein Array
-timestamps_array = np.array([timestamp_first, timestamp_780th_last])
-#print(timestamps_array)
-np.save("timestamps", timestamps_array)
+timestamps_array = np.array([timestamp_first, timestamp_840th_last])
 
+np.save("timestamps", timestamps_array) #wird in app.py verwendet zum plotten
+
+#hier machen wir features rein: zyklisches embedding der zeitangaben sowie normalisierung der wasserstandswerte
 def df_to_numpy(df):
     # Jahr - 200 und durch 1000 teilen
     df['Jahr'] = (df['Jahr'] - 2000) / 1000.0
@@ -74,17 +75,14 @@ def df_to_numpy(df):
     return df_transformed.to_numpy()
 
 
-array = df_to_numpy(df)
-# Ausgabe des Numpy-Arrays
-print(array.shape)#(12417, 10)
-
+array = df_to_numpy(df) #data transformation
 
 df = pd.DataFrame(array)  # your_data = dein Numpy-Array oder DataFrame
 df.columns = ["col1", "col2", "col3", "col4", "col5", "col6","col7","col8","col9","water_level"]
-# Zeiteinheiten in Minuten
-minutes_per_day = 60 * 24
-minutes_per_week = minutes_per_day * 7
-minutes_per_month = minutes_per_day * 30
+# mehr features , diesmal moving averages
+minutes_per_day = 60 * 24 #tägliche Durchschnitte
+minutes_per_week = minutes_per_day * 7 #wöchentliche durchschnitte
+minutes_per_month = minutes_per_day * 30 #monatliche Durchschnitte
 # Berechnung der Moving Averages
 df["MA_Day"] = df["water_level"].rolling(window=minutes_per_day, min_periods=1).mean()
 df["MA_Week"] = df["water_level"].rolling(window=minutes_per_week, min_periods=1).mean()
@@ -92,11 +90,10 @@ df["MA_Month"] = df["water_level"].rolling(window=minutes_per_month, min_periods
 # Spalten neu anordnen (Moving Averages an den Anfang)
 df = df[["MA_Month", "MA_Week", "MA_Day"] + df.columns[:-3].tolist()]
 
-print(df.head())  # Ausgabe der ersten Zeilen
 array = df.to_numpy()
-print(array.shape)
 
 
+#modell des kaggle notebooks wird geladen
 model = tf.keras.models.load_model(
     "fnn.h5",
     custom_objects={"mse": MeanSquaredError()}
@@ -104,8 +101,8 @@ model = tf.keras.models.load_model(
 arr = []
 input_datum = array[-840, :12].reshape(12,)
 input_stand = array[-840:, 12].reshape(840,)
-input = np.concatenate((input_datum, input_stand))#(909,)
-
+input = np.concatenate((input_datum, input_stand))
+#vorhersage für den ersten plot wird erstellt , live-vorhersage:
 for i in range(2): # funktioniert nur wenn input größer ist als output
     next_prediction = model.predict(input.reshape(1, -1), verbose=0).reshape(360, )
     arr = np.append(arr, next_prediction)
@@ -115,10 +112,11 @@ for i in range(2): # funktioniert nur wenn input größer ist als output
     input = input[360:]
     input = np.concatenate((array[-840+(i+1)*360, :12].reshape(12,),input)) #wegen der zeile wird das nicht unendlich autoregressiv laufen, dafür gehen die 9 datumswerte aus
 
-#print(arr.shape)
-#arr = np.concatenate([input_stand, arr ])
-np.save("input", input_stand * 1000)
-np.save("live_prediction", arr * 1000)
+
+np.save("input", input_stand * 1000) #für app.py
+np.save("live_prediction", arr * 1000) #für app.py
+
+#vorhersage für den zweiten plot, wöchentliche vorhersage:
 
 temp_arr = []
 historic_prediction = []
@@ -129,7 +127,7 @@ range_loop = 15 if datetime.now().hour < 12 else 16
 
 cut_off_var = array.shape[0] - 12 * 60 * (range_loop-1) - 840
 print(cut_off_var)
-#range_loop = 1
+
 for i in range(range_loop):
     historic_datum = array[(12 * i) * 60 , :12].reshape(12,)
     historic_stand = array[(12 * i) * 60 : ((12 * i) + 14) * 60 , 12].reshape(840,) # refer to onenote skizze
@@ -139,11 +137,11 @@ for i in range(range_loop):
 
 
     historic_prediction = []
-    for j in range(2):
+    for j in range(2): #autoregressiv
         historic_prediction_temp = model.predict(temp_arr.reshape(1, -1), verbose=0).reshape(360, )
-        #print(historic_prediction_temp.shape)
+
         historic_prediction = np.append(historic_prediction, historic_prediction_temp)
-        #print(historic_prediction.shape)
+
 
 
         temp_arr = temp_arr[12:]
@@ -153,23 +151,17 @@ for i in range(range_loop):
         print(temp_arr.shape)
 
     historic_prediction_full = np.append(historic_prediction_full, historic_prediction)
-print(len(historic_prediction_full))
 historic_prediction_full = historic_prediction_full[:(len(historic_prediction_full)-(720-cut_off_var))]
-#print(historic_prediction_full.shape)
 
-
-print(array[14 * 60 : 14 * 60 + 12 * 60 * range_loop , 12].shape)
 historic_input_full = array[14 * 60 : 14 * 60 + 12 * 60 * range_loop , 12]
-print(historic_input_full.shape)
 
 fehler_array = np.abs(historic_prediction_full - historic_input_full)
 
+#nur zum test lokal
 import matplotlib.pyplot as plt
 
 # Beispielarray mit 15120 Elementen (hier einfach eine Zahlenreihe von 0 bis 15119)
 data = list(range(15120))
-
-# Plot erstellen
 plt.figure(figsize=(10, 4))
 plt.plot(historic_prediction_full * 1000, linewidth=0.5)
 plt.plot(historic_input_full * 1000, linewidth=0.5)
@@ -180,11 +172,11 @@ plt.plot(np.full(10080, np.max(fehler_array * 1000)), linewidth=0.5)
 plt.title("Plot des Arrays")
 
 plt.show()
-
-np.save("historic_data", historic_input_full * 1000)
-np.save("historic_predictions", historic_prediction_full * 1000)
-np.save("error", fehler_array * 1000)
-np.save("mean_error",np.full(10080, np.mean(fehler_array * 1000)) )
-np.save("max_global_error",np.full(10080, np.max(fehler_array * 1000)) )
+#ergebnisse speichern
+np.save("historic_data", historic_input_full * 1000)#für app.py
+np.save("historic_predictions", historic_prediction_full * 1000)#für app.py
+np.save("error", fehler_array * 1000)#für app.py
+np.save("mean_error",np.full(10080, np.mean(fehler_array * 1000)) )#für app.py
+np.save("max_global_error",np.full(10080, np.max(fehler_array * 1000)) )#für app.py
 
 np.save("test_arr", array )

@@ -20,4 +20,4 @@ with open("sensor_data.csv", "w", newline="") as csvfile:
     writer.writeheader()  # Schreibe die Kopfzeile
     writer.writerows(measurements)  # Schreibe die Messwerte in die Datei
 
-print("✅ CSV-Datei wurde erfolgreich gespeichert!")
+print(" CSV-Datei wurde erfolgreich gespeichert!")
