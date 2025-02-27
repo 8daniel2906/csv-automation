@@ -53,9 +53,9 @@ time_steps = [pd.date_range(start=second_timestamp, periods=len(arr), freq='T') 
 # Zweiter Plot: 5 Arrays
 fig2 = go.Figure()
 
-fig2.add_trace(go.Scatter(x=time, y=array, mode='lines', name='Wasserstand der letzten Woche', line='purple'))
-fig2.add_trace(go.Scatter(x=time, y=array, mode='lines', name='Vorhersagen', line='purple'))
-fig2.add_trace(go.Scatter(x=time, y=array, mode='lines', name='Fehler der Vorhersage', line='orange'))
+fig2.add_trace(go.Scatter(x=time_steps, y=Wasserstand_der_letzten_Woche, mode='lines', name='Wasserstand der letzten Woche', line='purple'))
+fig2.add_trace(go.Scatter(x=time_steps, y=zwölfstündige_Vorhersagen, mode='lines', name='Vorhersagen', line='purple'))
+fig2.add_trace(go.Scatter(x=time_steps, y=Fehler_pro_Messung, mode='lines', name='Fehler der Vorhersage', line='orange'))
 
 
 fig2.update_layout(
