@@ -7,7 +7,7 @@ Zur Vorhersage: https://csv-automation-n4hzumwzdcoefrw3qrq9rs.streamlit.app/
 
 ## 🤖 Technologien & Tools
 - **Programmiersprache:** Python
-- **Datenverarbeitung:** Pandas, NumPy, SciPy
+- **Datenverarbeitung:** Pandas, NumPy
 - **Machine Learning:** TensorFlow, scikit-learn
 - **Visualisierung:** Matplotlib, Plotly
 - **Automatisierung:** GitHub Actions
@@ -19,41 +19,14 @@ Zur Vorhersage: https://csv-automation-n4hzumwzdcoefrw3qrq9rs.streamlit.app/
 - **Automatisierung:** Automatische Modellaktualisierung und Datenerneuerung
 - **Interaktive Visualisierung:** Web-App zur Darstellung der Vorhersagen
 
-## 📝 Installation & Nutzung
-### 1. Repository klonen
-```bash
-git clone https://github.com/dein-repo/wasserstandsvorhersage.git
-cd wasserstandsvorhersage
-```
-
-### 2. Abhängigkeiten installieren
-```bash
-pip install -r requirements.txt
-```
-
-### 3. Modell trainieren
-```bash
-python train_model.py
-```
-
-### 4. Web-App starten
-```bash
-streamlit run app.py
-```
 
 ## 🎉 Demo
 Eine Live-Demo der Anwendung ist hier verfügbar: [GitHub Pages / Streamlit Link](https://dein-link.com)
 
 ## ✨ Vorschau
-![Wasserstandsvorhersage-Dashboard](https://via.placeholder.com/800x400?text=Screenshot+der+Web-App)
-
-## 💡 Weiterentwicklung
-Zukünftige Features könnten beinhalten:
-- Verbesserung der Modellgenauigkeit durch Feature Engineering
-- Integration zusätzlicher Wetter- und Sensordaten
-- Deployment als API für Echtzeitanwendungen
+![Wasserstandsvorhersage-Dashboard][(https://csv-automation-n4hzumwzdcoefrw3qrq9rs.streamlit.app/)]
 
 ## 👥 Autor
-**[Dein Name]**  
+**[by Daniel Christ]**  
 Technomathematik-Student mit Interesse an Machine Learning und Data Science.  
-Kontakt: [LinkedIn](https://linkedin.com/in/deinprofil) | [GitHub](https://github.com/deinprofil)
+Kontakt: [LinkedIn]([https://linkedin.com/in/deinprofil](https://www.linkedin.com/in/daniel-christ-397555290/)) | E-Mail: da.christ@tuhh.de
