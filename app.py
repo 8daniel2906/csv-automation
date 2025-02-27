@@ -9,31 +9,18 @@ timestamps_array = np.load('timestamps.npy', allow_pickle=True)
 first_timestamp = pd.to_datetime(timestamps_array[1])
 second_timestamp = pd.to_datetime(timestamps_array[0])
 
-# **Manuelle Eingabe des Start-Zeitpunkts als Text**
-#datetime_str = st.text_input("w", value=first_timestamp.strftime("%Y-%m-%d %H:%M"))
-
-# **Konvertiere den Text in einen Timestamp**
-#try:
-#   start_datetime = pd.to_datetime(datetime_str, format="%Y-%m-%d %H:%M")
-#except ValueError:
-#    st.error(" Falsches Format! Bitte nutze YYYY-MM-DD HH:MM (z. B. 2024-02-21 14:30).")
-#    st.stop()
-
-# Beispiel: Zwei np.arrays laden
-# Ersetze dies durch den Pfad zu deinen eigenen .npy Dateien
 
 array_blue = np.load('input.npy')
 array_red = np.load('live_prediction.npy')
-#print(first_timestamp)
-#print(start_datetime)
+
 # **Zeitstempel für die x-Achse**
 time_blue = pd.date_range(start=first_timestamp, periods=len(array_blue), freq='T')
 time_red = pd.date_range(start=time_blue[-1] + pd.Timedelta(minutes=1), periods=len(array_red), freq='T')
 # Erster Plot: Zwei Arrays hintereinander
 fig1 = go.Figure()
 
-fig1.add_trace(go.Scatter(x=time_blue, y=array_blue, mode='lines', name='Wasserstand_der_letzten_Stunden', line=dict(color='blue')))
-fig1.add_trace(go.Scatter(x=time_red, y=array_red, mode='lines', name='Vorhersage', line=dict(color='red')))
+fig1.add_trace(go.Scatter(x=time_blue, y=array_blue, mode='lines', name='Wasserstand der letzten 14 Stunden', line=dict(color='blue')))
+fig1.add_trace(go.Scatter(x=time_red, y=array_red, mode='lines', name='Vorhersage der nächsten 12 Stunden', line=dict(color='red')))
 
 fig1.update_layout(
     title='Interaktives Zeit-Plot mit zwei Arrays',
@@ -48,15 +35,6 @@ st.plotly_chart(fig1)
 
 # Eine Trennlinie für bessere Übersicht
 st.markdown("---")
-
-# **Manuelle Eingabe für Plot 2**
-#datetime_str2 = st.text_input("Gib das Startdatum & Uhrzeit für Plot 2 ein (Format: YYYY-MM-DD HH:MM)", value=second_timestamp.strftime("%Y-%m-%d %H:%M"))
-# **Konvertiere Eingabe in Timestamp für Plot 2**
-#try:
-#    start_datetime2 = pd.to_datetime(datetime_str2, format="%Y-%m-%d %H:%M")
-#except ValueError:
-#    st.error("❌ Falsches Format für Plot 2! Bitte nutze YYYY-MM-DD HH:MM.")
-#    st.stop()
 
 # Laden der fünf neuen Arrays für den zweiten Plot
 Wasserstand_der_letzten_Woche = np.load('historic_data.npy')
@@ -74,7 +52,6 @@ time_steps = [pd.date_range(start=second_timestamp, periods=len(arr), freq='T') 
 
 # Zweiter Plot: 5 Arrays
 fig2 = go.Figure()
-
 
 
 for i, (array, time, color) in enumerate(zip(arrays, time_steps, colors)):
