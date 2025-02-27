@@ -50,12 +50,12 @@ time_1 = pd.date_range(start=second_timestamp, periods=len(Wasserstand_der_letzt
 fig2 = go.Figure()
 
 fig2.add_trace(go.Scatter(x=time_1, y=Wasserstand_der_letzten_Woche, mode='lines', name='Wasserstand der letzten Woche', line=dict(color='blue')))
-fig2.add_trace(go.Scatter(x=time_1, y=zwölfstündige_Vorhersagen, mode='lines', name='Vorhersage', line=dict(color='red')))
+fig2.add_trace(go.Scatter(x=time_1, y=zwölfstündige_Vorhersagen, mode='lines', name='Vorhersage', line=dict(color='red', width = 0.5)))
 fig2.add_trace(go.Scatter(x=time_1, y=Fehler_pro_Messung, mode='lines',
                           name=f'Vorhersagefehler <br>Ø Vorhersagefehler: {array_mean[0]:.2f}cm <br>MAX. Vorhersagefehler: {array_max[0]:.2f}cm',
-                          line=dict(color='orange')))
+                          line=dict(color='orange', width = 0.5)))
 
-# Hinzufügen eines Range Sliders
+# hinzufügen eines range sliders
 fig2.update_layout(
     title='Wasserstandvorhersage der letzten Woche',
     xaxis_title='Zeit',
@@ -67,7 +67,6 @@ fig2.update_layout(
             buttons=[
                 dict(count=1, label="1T", step="day", stepmode="backward"),
                 dict(count=3, label="3T", step="day", stepmode="backward"),
-                dict(count=7, label="1W", step="day", stepmode="backward"),
                 dict(step="all")
             ]
         )
