@@ -3,26 +3,6 @@ import numpy as np
 import plotly.graph_objects as go
 import pandas as pd
 
-#st.image("channel_1-4_9-11_03.jpg", caption="Mein Bild", use_column_width=True)
-
-
-def set_background(image_file):
-    with open(image_file, "rb") as f:
-        encoded_image = f.read().encode("base64").decode()
-
-    st.markdown(
-        f"""
-        <style>
-        .stApp {{
-            background-image: url("data:image/png;base64,{encoded_image}");
-            background-size: cover;
-        }}
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
-
 set_background("channel_1-4_9-11_03.jpg")
 
 
