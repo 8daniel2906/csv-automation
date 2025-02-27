@@ -3,7 +3,9 @@
 ## 🌍 Projektbeschreibung
 Dieses Projekt nutzt Machine Learning zur Vorhersage von Wasserständen basierend auf historischen Daten. 
 Durch den Einsatz eines neuronalen Netzes sollen präzise Prognosen erstellt werden, die für Anwendungen wie Hochwasserschutz oder Wassermanagement nützlich sein können.
-Zur Vorhersage: https://csv-automation-n4hzumwzdcoefrw3qrq9rs.streamlit.app/
+
+## 📈 Zur Vorhersage: 
+Eine Live-Demo der Anwendung ist hier verfügbar: [Streamlit Link](https://csv-automation-n4hzumwzdcoefrw3qrq9rs.streamlit.app/)
 
 ## 🤖 Technologien & Tools
 - **Programmiersprache:** Python
@@ -18,13 +20,6 @@ Zur Vorhersage: https://csv-automation-n4hzumwzdcoefrw3qrq9rs.streamlit.app/
 - **Modelltraining:** Entwicklung eines neuronalen Netzes zur Vorhersage
 - **Automatisierung:** Automatische Modellaktualisierung und Datenerneuerung
 - **Interaktive Visualisierung:** Web-App zur Darstellung der Vorhersagen
-
-
-## 🎉 Demo
-Eine Live-Demo der Anwendung ist hier verfügbar: [Streamlit Link](https://csv-automation-n4hzumwzdcoefrw3qrq9rs.streamlit.app/)
-
-## ✨ Vorschau
-![Wasserstandsvorhersage-Dashboard](https://csv-automation-n4hzumwzdcoefrw3qrq9rs.streamlit.app/)
 
 ## 👥 Autor
 **[by Daniel Christ]**  
