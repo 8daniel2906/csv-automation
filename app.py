@@ -3,9 +3,6 @@ import numpy as np
 import plotly.graph_objects as go
 import pandas as pd
 
-set_background("channel_1-4_9-11_03.jpg")
-
-
 timestamps_array = np.load('timestamps.npy', allow_pickle=True)
 
 # Konvertiere den ersten Timestamp zu einem datetime-Objekt
