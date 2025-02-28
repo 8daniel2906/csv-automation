@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/csv-automation.iml" filepath="$PROJECT_DIR$/.idea/csv-automation.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Wasserstandvorhersage.iml" filepath="$PROJECT_DIR$/.idea/Wasserstandvorhersage.iml" />
     </modules>
   </component>
 </project>
