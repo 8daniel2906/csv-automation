@@ -19,7 +19,7 @@ jobs:
 
       - name: Abhängigkeiten installieren
         run: |
-          pip install requests pyyaml streamlit pandas matplotlib plotly tensorflow datetime
+          pip install requests pyyaml streamlit pandas matplotlib plotly tensorflow datetime scipy
 
       - name: Alte JSON- , .npy- und CSV-Dateien löschen
         run: |

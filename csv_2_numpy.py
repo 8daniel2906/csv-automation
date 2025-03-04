@@ -3,21 +3,21 @@ import tensorflow as tf
 from tensorflow.keras.losses import MeanSquaredError
 import numpy as np
 from datetime import datetime
-# CSV einlesen
+import scipy
+
 df = pd.read_csv("sensor_data.csv", delimiter=",", names=["Zeit", "Wert"], skiprows=1)
 df = df[df["Wert"] != 0]
-# Zeitspalte in Datetime umwandeln und neue Zeitspalten extrahieren
 df["Zeit"] = pd.to_datetime(df["Zeit"])
 df[["Jahr", "Monat", "Tag", "Stunde", "Minute"]] = df["Zeit"].apply(lambda x: [x.year, x.month, x.day, x.hour, x.minute]).apply(pd.Series)
 
-# Vollständige Zeitreihe erstellen
+
 full_time_index = pd.date_range(df["Zeit"].min(), df["Zeit"].max(), freq="T")
 df_full = pd.DataFrame({"Zeit": full_time_index})
 df_full[["Jahr", "Monat", "Tag", "Stunde", "Minute"]] = df_full["Zeit"].apply(lambda x: [x.year, x.month, x.day, x.hour, x.minute]).apply(pd.Series)
 
 # Originalwerte einfügen und interpolieren
 df = df_full.merge(df.drop(columns=["Zeit"]), on=["Jahr", "Monat", "Tag", "Stunde", "Minute"], how="left")
-df["Wert"] = df["Wert"].interpolate(method="linear")#falls werte einfach aus dem sensor fehlen, also man pro minute nicht einen wert hat (passiert in den 2 aktuellsten tagen immer sowieso)
+df["Wert"] = df["Wert"].interpolate(method="nearest")#falls werte einfach aus dem sensor fehlen, also man pro minute nicht einen wert hat (passiert in den 2 aktuellsten tagen immer sowieso)
 
 # Zeitspalte entfernen und Spalten neu anordnen
 df = df.drop(columns=["Zeit"])[["Jahr", "Monat", "Tag", "Stunde", "Minute", "Wert"]]
@@ -132,8 +132,8 @@ for i in range(range_loop):
     historic_datum = array[(12 * i) * 60 , :12].reshape(12,)
     historic_stand = array[(12 * i) * 60 : ((12 * i) + 14) * 60 , 12].reshape(840,) # refer to onenote skizze
     temp_arr = np.concatenate((historic_datum, historic_stand))
-    print(historic_datum.shape)
-    print(historic_stand.shape)
+    #print(historic_datum.shape)
+    #print(historic_stand.shape)
 
 
     historic_prediction = []
@@ -148,7 +148,7 @@ for i in range(range_loop):
         temp_arr = np.concatenate((temp_arr, historic_prediction_temp))
         temp_arr = temp_arr[360:]
         temp_arr = np.concatenate((array[(12 * i) * 60 + (j + 1) * 360, :12].reshape(12, ), temp_arr))
-        print(temp_arr.shape)
+        #print(temp_arr.shape)
 
     historic_prediction_full = np.append(historic_prediction_full, historic_prediction)
 historic_prediction_full = historic_prediction_full[:(len(historic_prediction_full)-(720-cut_off_var))]
@@ -156,6 +156,10 @@ historic_prediction_full = historic_prediction_full[:(len(historic_prediction_fu
 historic_input_full = array[14 * 60 : 14 * 60 + 12 * 60 * range_loop , 12]
 
 fehler_array = np.abs(historic_prediction_full - historic_input_full)
+
+print(historic_input_full.shape)
+
+
 
 #nur zum test lokal
 import matplotlib.pyplot as plt
