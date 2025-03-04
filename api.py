@@ -12,8 +12,8 @@ morgen = (jetzt + timedelta(days=1)).replace(hour=0, minute=0, second=0, microse
 vor_sechs_tagen = (jetzt - timedelta(days=8)).replace(hour=10, minute=0, second=0, microsecond=0).isoformat()
 
 # API-Link mit Platzhaltern
-api_url_template = "https://api.opensensorweb.de/v1/organizations/pikobytes/networks/bafg/devices/5952025/sensors/w/measurements/raw?start={start}%2B01:00&end={end}%2B01:00&interpolator=LINEAR"
-
+#api_url_template = "https://api.opensensorweb.de/v1/organizations/pikobytes/networks/bafg/devices/5952025/sensors/w/measurements/raw?start={start}%2B01:00&end={end}%2B01:00&interpolator=LINEAR"
+api_url_template = "https://api.opensensorweb.de/v1/organizations/pikobytes/networks/bafg/devices/5952020/sensors/w/measurements/raw?start={start}%2B01:00&end={end}%2B01:00&interpolator=LINEAR"
 # Link mit den berechneten Datumswerten ersetzen
 api_url = api_url_template.format(start=vor_sechs_tagen, end=morgen)
 

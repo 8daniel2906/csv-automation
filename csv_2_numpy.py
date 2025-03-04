@@ -6,6 +6,9 @@ from datetime import datetime
 import scipy
 
 df = pd.read_csv("sensor_data.csv", delimiter=",", names=["Zeit", "Wert"], skiprows=1)
+
+
+
 df = df[df["Wert"] != 0]
 df["Zeit"] = pd.to_datetime(df["Zeit"])
 df[["Jahr", "Monat", "Tag", "Stunde", "Minute"]] = df["Zeit"].apply(lambda x: [x.year, x.month, x.day, x.hour, x.minute]).apply(pd.Series)
@@ -17,7 +20,10 @@ df_full[["Jahr", "Monat", "Tag", "Stunde", "Minute"]] = df_full["Zeit"].apply(la
 
 # Originalwerte einfügen und interpolieren
 df = df_full.merge(df.drop(columns=["Zeit"]), on=["Jahr", "Monat", "Tag", "Stunde", "Minute"], how="left")
-df["Wert"] = df["Wert"].interpolate(method="nearest")#falls werte einfach aus dem sensor fehlen, also man pro minute nicht einen wert hat (passiert in den 2 aktuellsten tagen immer sowieso)
+
+
+
+df["Wert"] = df["Wert"].interpolate(method="linear")#falls werte einfach aus dem sensor fehlen, also man pro minute nicht einen wert hat (passiert in den 2 aktuellsten tagen immer sowieso)
 
 # Zeitspalte entfernen und Spalten neu anordnen
 df = df.drop(columns=["Zeit"])[["Jahr", "Monat", "Tag", "Stunde", "Minute", "Wert"]]
@@ -151,14 +157,12 @@ for i in range(range_loop):
         #print(temp_arr.shape)
 
     historic_prediction_full = np.append(historic_prediction_full, historic_prediction)
+
 historic_prediction_full = historic_prediction_full[:(len(historic_prediction_full)-(720-cut_off_var))]
 
 historic_input_full = array[14 * 60 : 14 * 60 + 12 * 60 * range_loop , 12]
 
 fehler_array = np.abs(historic_prediction_full - historic_input_full)
-
-print(historic_input_full.shape)
-
 
 
 #nur zum test lokal
