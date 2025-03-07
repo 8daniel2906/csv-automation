@@ -3,30 +3,20 @@ import tensorflow as tf
 from tensorflow.keras.losses import MeanSquaredError
 import numpy as np
 from datetime import datetime
-import scipy
+
+#die jetzige version kommt noch nicht gut klar mit sensordatenlücken, die über eine Stunde hinausgehen
 
 df = pd.read_csv("sensor_data.csv", delimiter=",", names=["Zeit", "Wert"], skiprows=1)
-
-
-
 df = df[df["Wert"] != 0]
 df["Zeit"] = pd.to_datetime(df["Zeit"])
 df[["Jahr", "Monat", "Tag", "Stunde", "Minute"]] = df["Zeit"].apply(lambda x: [x.year, x.month, x.day, x.hour, x.minute]).apply(pd.Series)
-
-
 full_time_index = pd.date_range(df["Zeit"].min(), df["Zeit"].max(), freq="T")
 df_full = pd.DataFrame({"Zeit": full_time_index})
 df_full[["Jahr", "Monat", "Tag", "Stunde", "Minute"]] = df_full["Zeit"].apply(lambda x: [x.year, x.month, x.day, x.hour, x.minute]).apply(pd.Series)
-
-# Originalwerte einfügen und interpolieren
 df = df_full.merge(df.drop(columns=["Zeit"]), on=["Jahr", "Monat", "Tag", "Stunde", "Minute"], how="left")
-
-
-
 df["Wert"] = df["Wert"].interpolate(method="linear")#falls werte einfach aus dem sensor fehlen, also man pro minute nicht einen wert hat (passiert in den 2 aktuellsten tagen immer sowieso)
-
-# Zeitspalte entfernen und Spalten neu anordnen
 df = df.drop(columns=["Zeit"])[["Jahr", "Monat", "Tag", "Stunde", "Minute", "Wert"]]
+
 #man macht hier 840 ,weil hier geplottet wird, nicht als input für das modell verwendet wird
 jahr1 = int(df.iloc[840]['Jahr'])
 monat1 = int(df.iloc[840]['Monat'])
@@ -40,16 +30,15 @@ tag2 = int(df.iloc[-840]['Tag'])
 stunde2 = int(df.iloc[-840]['Stunde'])
 minute2 = int(df.iloc[-840]['Minute'])
 
-# Datum der ersten Zeile extrahieren
+
 timestamp_first = pd.to_datetime(f"{jahr1}-{monat1}-{tag1} {stunde1}:{minute1}")
 timestamp_840th_last = pd.to_datetime(f"{jahr2}-{monat2}-{tag2} {stunde2}:{minute2}")
-
-# Packe die Timestamps in ein Array
 timestamps_array = np.array([timestamp_first, timestamp_840th_last])
 
 np.save("timestamps", timestamps_array) #wird in app.py verwendet zum plotten
 
 #hier machen wir features rein: zyklisches embedding der zeitangaben sowie normalisierung der wasserstandswerte
+
 def df_to_numpy(df):
     # Jahr - 200 und durch 1000 teilen
     df['Jahr'] = (df['Jahr'] - 2000) / 1000.0
@@ -80,7 +69,6 @@ def df_to_numpy(df):
     # Numpy-Array erstellen
     return df_transformed.to_numpy()
 
-
 array = df_to_numpy(df) #data transformation
 
 df = pd.DataFrame(array)  # your_data = dein Numpy-Array oder DataFrame
@@ -104,6 +92,7 @@ model = tf.keras.models.load_model(
     "fnn.h5",
     custom_objects={"mse": MeanSquaredError()}
 )
+
 arr = []
 input_datum = array[-840, :12].reshape(12,)
 input_stand = array[-840:, 12].reshape(840,)
@@ -180,6 +169,7 @@ plt.plot(np.full(10080, np.max(fehler_array * 1000)), linewidth=0.5)
 plt.title("Plot des Arrays")
 
 plt.show()
+
 #ergebnisse speichern
 np.save("historic_data", historic_input_full * 1000)#für app.py
 np.save("historic_predictions", historic_prediction_full * 1000)#für app.py
