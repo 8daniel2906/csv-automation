@@ -1,4 +1,4 @@
 git add .
-git commit -m "fixed for-loop in hyperparameter tuning"
+git commit -m "comments"
 git pull
 git push

@@ -10,8 +10,8 @@ morgen = (jetzt + timedelta(days=1)).replace(hour=0, minute=0, second=0, microse
 vor_acht_tagen = (jetzt - timedelta(days=8)).replace(hour=10, minute=0, second=0, microsecond=0).isoformat()
 
 # link mit Platzhaltern
-#api_url_template = "https://api.opensensorweb.de/v1/organizations/pikobytes/networks/bafg/devices/5952025/sensors/w/measurements/raw?start={start}%2B01:00&end={end}%2B01:00&interpolator=LINEAR"
-api_url_template = "https://api.opensensorweb.de/v1/organizations/pikobytes/networks/bafg/devices/5952020/sensors/w/measurements/raw?start={start}%2B01:00&end={end}%2B01:00&interpolator=LINEAR"
+api_url_template = "https://api.opensensorweb.de/v1/organizations/pikobytes/networks/bafg/devices/5952025/sensors/w/measurements/raw?start={start}%2B01:00&end={end}%2B01:00&interpolator=LINEAR"
+#api_url_template = "https://api.opensensorweb.de/v1/organizations/pikobytes/networks/bafg/devices/5952020/sensors/w/measurements/raw?start={start}%2B01:00&end={end}%2B01:00&interpolator=LINEAR"
 
 api_url = api_url_template.format(start=vor_acht_tagen, end=morgen)
 url = api_url
