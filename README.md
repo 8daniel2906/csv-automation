@@ -18,7 +18,7 @@ Eine Live-Demo der Anwendung ist hier verfügbar: [Streamlit Link](https://csv-a
 ## Features
 - **Datenaufbereitung:** Bereinigung und Analyse historischer Wasserstandsdaten
 - **Modelltraining:** Entwicklung eines neuronalen Netzes zur Vorhersage
-- **Automatisierung:** Automatische Modellaktualisierung und Datenerneuerung
+- **Automatisierung:** Automatische Plotaktualisierung und Datenerneuerung
 - **Interaktive Visualisierung:** Web-App zur Darstellung der Vorhersagen
 
 ## 👥 Autor
