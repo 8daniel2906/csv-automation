@@ -5,16 +5,21 @@ import numpy as np
 from datetime import datetime
 
 #die jetzige version kommt noch nicht gut klar mit sensordatenlücken, die über eine Stunde hinausgehen
-
+#umwandlung in ein df mit 2 spalten
 df = pd.read_csv("sensor_data.csv", delimiter=",", names=["Zeit", "Wert"], skiprows=1)
+#sensorfehler enthalten messungen = 0. die werden entfernt
 df = df[df["Wert"] != 0]
+#Zeit-spalte kriegt datentyp passend zu einem datum
 df["Zeit"] = pd.to_datetime(df["Zeit"])
+#sensor misst nur alle paar minuten, in nicht gemessenen minuten gibt es auch keinen wasserstand.
+#man muss die zeitangaben mit lücken dann mit den fehlenden zeitangaben auffüllen und die wasserstände
+#mit NaN ersetzen --> also mehr zeilen adden
+df_full = pd.DataFrame({"Zeit": pd.date_range(df["Zeit"].min(), df["Zeit"].max(), freq="min")})
+#left join und dann die NaN Werte interpolieren
+df = df_full.merge(df, on="Zeit", how="left").interpolate(method="linear")
+
+
 df[["Jahr", "Monat", "Tag", "Stunde", "Minute"]] = df["Zeit"].apply(lambda x: [x.year, x.month, x.day, x.hour, x.minute]).apply(pd.Series)
-full_time_index = pd.date_range(df["Zeit"].min(), df["Zeit"].max(), freq="T")
-df_full = pd.DataFrame({"Zeit": full_time_index})
-df_full[["Jahr", "Monat", "Tag", "Stunde", "Minute"]] = df_full["Zeit"].apply(lambda x: [x.year, x.month, x.day, x.hour, x.minute]).apply(pd.Series)
-df = df_full.merge(df.drop(columns=["Zeit"]), on=["Jahr", "Monat", "Tag", "Stunde", "Minute"], how="left")
-df["Wert"] = df["Wert"].interpolate(method="linear")#falls werte einfach aus dem sensor fehlen, also man pro minute nicht einen wert hat (passiert in den 2 aktuellsten tagen immer sowieso)
 df = df.drop(columns=["Zeit"])[["Jahr", "Monat", "Tag", "Stunde", "Minute", "Wert"]]
 
 #man macht hier 840 ,weil hier geplottet wird, nicht als input für das modell verwendet wird
@@ -71,12 +76,14 @@ def df_to_numpy(df):
 
 array = df_to_numpy(df) #data transformation
 
-df = pd.DataFrame(array)  # your_data = dein Numpy-Array oder DataFrame
+
+
+df = pd.DataFrame(array)
 df.columns = ["col1", "col2", "col3", "col4", "col5", "col6","col7","col8","col9","water_level"]
-# mehr features , diesmal moving averages
+# mehr features , diesmal moving averages #minutes_per_week und minutes_per_month sind hier aber erstmal gleich inhaltlich ,weil ich nur daten der letzen woche entnehme
 minutes_per_day = 60 * 24 #tägliche Durchschnitte
 minutes_per_week = minutes_per_day * 7 #wöchentliche durchschnitte
-minutes_per_month = minutes_per_day * 30 #monatliche Durchschnitte
+minutes_per_month = minutes_per_day * 30 #monatliche Durchschnitte !!!! das feature macht eigentlich noch keinen sinn , wenn ich nur für eine Woche  die Vorhersagendemonstration mache
 # Berechnung der Moving Averages
 df["MA_Day"] = df["water_level"].rolling(window=minutes_per_day, min_periods=1).mean()
 df["MA_Week"] = df["water_level"].rolling(window=minutes_per_week, min_periods=1).mean()
@@ -86,6 +93,7 @@ df = df[["MA_Month", "MA_Week", "MA_Day"] + df.columns[:-3].tolist()]
 
 array = df.to_numpy()
 
+print("array:  ",array.shape )
 
 #modell des kaggle notebooks wird geladen
 model = tf.keras.models.load_model(
