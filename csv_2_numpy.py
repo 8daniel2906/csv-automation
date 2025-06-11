@@ -167,6 +167,8 @@ temp_arr = []
 historic_prediction = []
 historic_prediction_temp = []
 historic_prediction_full = []
+lower_hist_ = []
+upper_hist_ = []
 range_loop = 15 if datetime.now().hour < 12 else 16     # range_loop = 15 if datetime.now().hour < 12 else 16
 
 
@@ -195,10 +197,21 @@ for i in range(range_loop):
         temp_arr = np.concatenate((array[(12 * i) * 60 + (j + 1) * 360, :12].reshape(12, ), temp_arr))
         #print(temp_arr.shape)
 
+    q_low_hist, q_up_hist = get_prediction_interval_with_timebins(historic_prediction * 1000, kmeans, q_lo_dict, q_hi_dict, time_bins, chunk_size)
+    lower_hist = historic_prediction * 1000 - np.abs(q_low_hist)
+    upper_hist = historic_prediction * 1000 + np.abs(q_up_hist)
+    lower_hist_.append(lower_hist)
+    upper_hist_.append(upper_hist)
     historic_prediction_full = np.append(historic_prediction_full, historic_prediction)
 
+lower_hist_ = np.array(lower_hist_)
+upper_hist_ =  np.array(upper_hist_)
+lower_hist_ = lower_hist_.flatten()
+upper_hist_ = upper_hist_.flatten()
 historic_prediction_full = historic_prediction_full[:(len(historic_prediction_full)-(720-cut_off_var))]
-
+lower_hist_ = lower_hist_[:(len(lower_hist_)-(720-cut_off_var))]
+upper_hist_ = upper_hist_[:(len(upper_hist_)-(720-cut_off_var))]
+print("upper_histzz",  len(upper_hist_))
 historic_input_full = array[14 * 60 : 14 * 60 + 12 * 60 * range_loop , 12]
 
 fehler_array = np.abs(historic_prediction_full - historic_input_full)
@@ -210,6 +223,8 @@ import matplotlib.pyplot as plt
 # Beispielarray mit 15120 Elementen (hier einfach eine Zahlenreihe von 0 bis 15119)
 data = list(range(15120))
 plt.figure(figsize=(10, 4))
+plt.plot(lower_hist_ , linewidth=0.5)
+plt.plot(upper_hist_ , linewidth=0.5)
 plt.plot(historic_prediction_full * 1000, linewidth=0.5)
 plt.plot(historic_input_full * 1000, linewidth=0.5)
 plt.plot(fehler_array * 1000, linewidth=0.5)
@@ -226,5 +241,6 @@ np.save("historic_predictions", historic_prediction_full * 1000)#für app.py
 np.save("error", fehler_array * 1000)#für app.py
 np.save("mean_error",np.full(10080, np.mean(fehler_array * 1000)) )#für app.py
 np.save("max_global_error",np.full(10080, np.max(fehler_array * 1000)) )#für app.py
-
+np.save("lower_historic", lower_hist_)
+np.save("upper_historic", upper_hist_)
 np.save("test_arr", array )

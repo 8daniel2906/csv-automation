@@ -14,6 +14,8 @@ array_blue = np.load('input.npy')
 array_red = np.load('live_prediction.npy')
 lower = np.load('lower.npy')
 upper = np.load('upper.npy')
+lower_historic = np.load('lower_historic.npy')
+upper_historic = np.load('upper_historic.npy')
 
 # Zeitstempel für die x-Achse
 time_blue = pd.date_range(start=first_timestamp, periods=len(array_blue), freq='T')
@@ -74,6 +76,23 @@ fig2.add_trace(go.Scatter(x=time_1, y=zwölfstündige_Vorhersagen, mode='lines',
 fig2.add_trace(go.Scatter(x=time_1, y=Fehler_pro_Messung, mode='lines',
                           name=f'Vorhersagefehler <br>Ø Vorhersagefehler: {array_mean[0]:.2f}cm <br>MAX. Vorhersagefehler: {array_max[0]:.2f}cm',
                           line=dict(color='orange', width = 0.5)))
+
+fig2.add_trace(go.Scatter(
+    x=time_1,
+    y=lower_historic,
+    mode='lines',
+    name='Neue Linie',  # Optional: beschreibe die Linie sinnvoll
+    line=dict(color='green', width=1)
+))
+
+fig2.add_trace(go.Scatter(
+    x=time_1,
+    y=upper_historic,
+    mode='lines',
+    name='Neue Linie',  # Optional: beschreibe die Linie sinnvoll
+    line=dict(color='green', width=1)
+))
+
 
 # hinzufügen eines range sliders
 fig2.update_layout(
