@@ -208,10 +208,11 @@ lower_hist_ = np.array(lower_hist_)
 upper_hist_ =  np.array(upper_hist_)
 lower_hist_ = lower_hist_.flatten()
 upper_hist_ = upper_hist_.flatten()
+
 historic_prediction_full = historic_prediction_full[:(len(historic_prediction_full)-(720-cut_off_var))]
 lower_hist_ = lower_hist_[:(len(lower_hist_)-(720-cut_off_var))]
 upper_hist_ = upper_hist_[:(len(upper_hist_)-(720-cut_off_var))]
-print("upper_histzz",  len(upper_hist_))
+
 historic_input_full = array[14 * 60 : 14 * 60 + 12 * 60 * range_loop , 12]
 
 fehler_array = np.abs(historic_prediction_full - historic_input_full)
@@ -232,6 +233,8 @@ plt.plot(np.zeros(10080), linewidth=0.5)
 plt.plot(np.full(10080, np.mean(fehler_array * 1000)), linewidth=0.5)
 plt.plot(np.full(10080, np.max(fehler_array * 1000)), linewidth=0.5)
 plt.title("Plot des Arrays")
+
+
 
 plt.show()
 
