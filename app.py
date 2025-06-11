@@ -121,7 +121,7 @@ fig2.add_trace(go.Scatter(
     y=upper_historic,
     mode='lines',
     name=f'90%-Konfidenzintervall <br>Hit-Rate: {hit_rate}% <br>Ø Intervallbreite: {summe}cm',
-    line=dict(color='green', width=1),
+    line=dict(color='green', width=0.1),
     fill='tonexty',
     fillcolor='rgba(0, 255, 0, 0.2)'  # Transparente grüne Füllung
 ))
