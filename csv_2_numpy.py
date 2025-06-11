@@ -3,6 +3,44 @@ import tensorflow as tf
 from tensorflow.keras.losses import MeanSquaredError
 import numpy as np
 from datetime import datetime
+import joblib
+import sklearn
+
+
+#######################################################################
+def get_prediction_interval_with_timebins(pred_serie, kmeans, q_lo_dict, q_hi_dict,
+                                          time_bins, chunk_size):
+    lo_list = []
+    hi_list = []
+
+    for start in range(0, len(pred_serie), chunk_size):
+        end = start + chunk_size
+        if end > len(pred_serie):
+            break
+
+        chunk = pred_serie[start:end]
+        cluster = kmeans.predict([chunk])[0]
+
+        time_center = (start + end) // 2
+        time_bin = np.digitize(time_center, time_bins, right=False) - 1
+
+        q_lo = q_lo_dict.get((time_bin, cluster), 0)
+        q_hi = q_hi_dict.get((time_bin, cluster), 0)
+
+        lo_list.extend([q_lo] * chunk_size)
+        hi_list.extend([q_hi] * chunk_size)
+
+    return np.array(lo_list), np.array(hi_list)
+# Laden
+model_bundle = joblib.load('kmeans_interval_model.pkl')
+# Zugriff auf Inhalte
+kmeans = model_bundle['kmeans']
+q_lo_dict = model_bundle['q_lo_dict']
+q_hi_dict = model_bundle['q_hi_dict']
+time_bins = model_bundle['time_bins']
+chunk_size = model_bundle['chunk_size']
+###################################################################################
+
 
 #die jetzige version kommt noch nicht gut klar mit sensordatenlücken, die über eine Stunde hinausgehen
 #umwandlung in ein df mit 2 spalten
@@ -109,16 +147,20 @@ input = np.concatenate((input_datum, input_stand))
 for i in range(2): # funktioniert nur wenn input größer ist als output
     next_prediction = model.predict(input.reshape(1, -1), verbose=0).reshape(360, )
     arr = np.append(arr, next_prediction)
-
     input = input[12:]
     input = np.concatenate((input,next_prediction))
     input = input[360:]
     input = np.concatenate((array[-840+(i+1)*360, :12].reshape(12,),input)) #wegen der zeile wird das nicht unendlich autoregressiv laufen, dafür gehen die 9 datumswerte aus
 
+q_low, q_up = get_prediction_interval_with_timebins(arr*1000, kmeans, q_lo_dict, q_hi_dict, time_bins, chunk_size)
+lower = arr*1000 - np.abs(q_low)
+upper = arr*1000 + np.abs(q_up)
+
 
 np.save("input", input_stand * 1000) #für app.py
 np.save("live_prediction", arr * 1000) #für app.py
-
+np.save("lower",lower)
+np.save("upper",upper)
 #vorhersage für den zweiten plot, wöchentliche vorhersage:
 
 temp_arr = []

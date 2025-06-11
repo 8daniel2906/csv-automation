@@ -12,6 +12,8 @@ second_timestamp = pd.to_datetime(timestamps_array[0])
 
 array_blue = np.load('input.npy')
 array_red = np.load('live_prediction.npy')
+lower = np.load('lower.npy')
+upper = np.load('upper.npy')
 
 # Zeitstempel für die x-Achse
 time_blue = pd.date_range(start=first_timestamp, periods=len(array_blue), freq='T')
@@ -21,6 +23,25 @@ fig1 = go.Figure()
 
 fig1.add_trace(go.Scatter(x=time_blue, y=array_blue, mode='lines', name='Wasserstand der letzten 14 Stunden', line=dict(color='blue')))
 fig1.add_trace(go.Scatter(x=time_red, y=array_red, mode='lines', name='Vorhersage der nächsten 12 Stunden', line=dict(color='red')))
+# Obere Grenze
+fig1.add_trace(go.Scatter(
+    x=time_red,
+    y=upper,
+    mode='lines',
+    line=dict(width=0),
+    showlegend=False
+))
+
+# Untere Grenze mit Füllung bis zur oberen
+fig1.add_trace(go.Scatter(
+    x=time_red,
+    y=lower,
+    mode='lines',
+    fill='tonexty',
+    fillcolor='rgba(255,165,0,0.3)',  # Orange mit alpha 0.3
+    line=dict(width=0),
+    name='± Quantil'
+))
 
 fig1.update_layout(
     title='Live - Vorhersage',
