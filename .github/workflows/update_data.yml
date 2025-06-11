@@ -23,7 +23,7 @@ jobs:
 
       - name: Alte JSON- , .npy- und CSV-Dateien löschen
         run: |
-          rm -f sensor_data.json sensor_data.csv historic_data.npy historic_predictions.npy error.npy mean_error.npy max_global_error.npy timestamps.npy input.npy live_prediction.npy
+          rm -f sensor_data.json sensor_data.csv historic_data.npy historic_predictions.npy error.npy mean_error.npy max_global_error.npy timestamps.npy input.npy live_prediction.npy lower.npy upper.npy
 
       - name: API-Daten abrufen
         run: python api.py

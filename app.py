@@ -40,7 +40,7 @@ fig1.add_trace(go.Scatter(
     fill='tonexty',
     fillcolor='rgba(255,165,0,0.3)',  # Orange mit alpha 0.3
     line=dict(width=0),
-    name='± Quantil'
+    name='± 90% Quantil'
 ))
 
 fig1.update_layout(
