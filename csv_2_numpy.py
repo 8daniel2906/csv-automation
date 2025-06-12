@@ -39,6 +39,7 @@ q_lo_dict = model_bundle['q_lo_dict']
 q_hi_dict = model_bundle['q_hi_dict']
 time_bins = model_bundle['time_bins']
 chunk_size = model_bundle['chunk_size']
+print(chunk_size)
 ###################################################################################
 
 
@@ -130,7 +131,7 @@ df["MA_Month"] = df["water_level"].rolling(window=minutes_per_month, min_periods
 df = df[["MA_Month", "MA_Week", "MA_Day"] + df.columns[:-3].tolist()]
 
 array = df.to_numpy()
-
+np.save("test_array",array)
 print("array:  ",array.shape )
 
 #modell des kaggle notebooks wird geladen
