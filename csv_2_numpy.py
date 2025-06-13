@@ -40,6 +40,10 @@ q_hi_dict = model_bundle['q_hi_dict']
 time_bins = model_bundle['time_bins']
 chunk_size = model_bundle['chunk_size']
 print(chunk_size)
+data = np.load("quantile_dicts.npz", allow_pickle=True)
+q_lo_dict = data["q_lo"].item()
+q_hi_dict = data["q_hi"].item()
+
 ###################################################################################
 
 
