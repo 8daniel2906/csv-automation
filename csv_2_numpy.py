@@ -5,7 +5,7 @@ import numpy as np
 from datetime import datetime
 import joblib
 import sklearn
-
+print(sklearn.__version__)#1.7.0
 
 #######################################################################
 def get_prediction_interval_with_timebins(pred_serie, kmeans, q_lo_dict, q_hi_dict,
@@ -32,7 +32,7 @@ def get_prediction_interval_with_timebins(pred_serie, kmeans, q_lo_dict, q_hi_di
 
     return np.array(lo_list), np.array(hi_list)
 # Laden
-model_bundle = joblib.load('kmeans_interval_model.pkl')
+model_bundle = joblib.load('kmeans_interval_model4.pkl')
 # Zugriff auf Inhalte
 kmeans = model_bundle['kmeans']
 q_lo_dict = model_bundle['q_lo_dict']
@@ -40,9 +40,16 @@ q_hi_dict = model_bundle['q_hi_dict']
 time_bins = model_bundle['time_bins']
 chunk_size = model_bundle['chunk_size']
 print(chunk_size)
-data = np.load("quantile_dicts.npz", allow_pickle=True)
-q_lo_dict = data["q_lo"].item()
-q_hi_dict = data["q_hi"].item()
+model_bundle = joblib.load("kmeans_interval_model4.pkl")
+
+print("Loaded keys:", model_bundle.keys())
+print("Chunk size:", model_bundle.get("chunk_size"))
+print("KMeans object:", type(model_bundle.get("kmeans")))
+print("Time bins:", model_bundle.get("time_bins"))
+
+#data = np.load("quantile_dicts.npz", allow_pickle=True)
+#q_lo_dict = data["q_lo"].item()
+#q_hi_dict = data["q_hi"].item()
 
 ###################################################################################
 
