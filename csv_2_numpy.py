@@ -32,7 +32,7 @@ def get_prediction_interval_with_timebins(pred_serie, kmeans, q_lo_dict, q_hi_di
 
     return np.array(lo_list), np.array(hi_list)
 # Laden
-model_bundle = joblib.load('kmeans_interval_model4.pkl')
+model_bundle = joblib.load('kmeans_interval_model5.pkl')
 # Zugriff auf Inhalte
 kmeans = model_bundle['kmeans']
 #q_lo_dict = model_bundle['q_lo_dict']
@@ -40,7 +40,7 @@ kmeans = model_bundle['kmeans']
 time_bins = model_bundle['time_bins']
 chunk_size = model_bundle['chunk_size']
 print(chunk_size)
-model_bundle = joblib.load("kmeans_interval_model4.pkl")
+#model_bundle = joblib.load("kmeans_interval_model4.pkl")
 
 
 data = np.load("quantile_dicts.npz", allow_pickle=True)
