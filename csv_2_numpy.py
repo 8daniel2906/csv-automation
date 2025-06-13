@@ -32,7 +32,7 @@ def get_prediction_interval_with_timebins(pred_serie, kmeans, q_lo_dict, q_hi_di
 
     return np.array(lo_list), np.array(hi_list)
 # Laden
-model_bundle = joblib.load('kmeans_interval_model5.pkl')
+model_bundle = joblib.load('kmeans_interval_model.pkl')
 # Zugriff auf Inhalte
 kmeans = model_bundle['kmeans']
 #q_lo_dict = model_bundle['q_lo_dict']
