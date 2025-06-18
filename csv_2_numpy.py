@@ -57,7 +57,7 @@ def get_quantile_bounds_from_labels(cluster_labels, time_labels, interval_matrix
 
     return lo_array, hi_array
 # Laden
-model_bundle = joblib.load('kmeans_interval_model7.pkl')
+model_bundle = joblib.load('kmeans_interval_model8.pkl')
 # Zugriff auf Inhalte
 kmeans = model_bundle['kmeans']
 interval_matrix = model_bundle['interval_matrix']
