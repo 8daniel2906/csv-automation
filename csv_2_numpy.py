@@ -184,8 +184,7 @@ for i in range(2): # funktioniert nur wenn input größer ist als output
 
 cluster_labels2 = assign_clusters_inference(arr*100, chunk, kmeans)
 q_low, q_up = get_quantile_bounds_from_labels(cluster_labels2, time_labels_klein, interval_matrix)
-q_low = -26
-q_up = 47
+
 lower = arr*1000 - np.abs(q_low)
 upper = arr*1000 + np.abs(q_up)
 
@@ -232,8 +231,7 @@ for i in range(range_loop):
 
     cluster_labels2 = assign_clusters_inference(1000*historic_prediction, chunk, kmeans)  # chunk, kmeans global
     q_low_hist, q_up_hist = get_quantile_bounds_from_labels(cluster_labels2, time_labels_klein, interval_matrix)
-    q_low_hist = -26
-    q_up_hist = 47
+
     lower_hist = historic_prediction * 1000 - np.abs(q_low_hist)
     upper_hist = historic_prediction * 1000 + np.abs(q_up_hist)
 
