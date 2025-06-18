@@ -65,7 +65,7 @@ prediction1 = model_bundle['prediction1']
 
 chunk = 180
 cluster = 10
-time_bins = 10
+time_teile = 10
 
 time_labels_klein = assign_time_bins_full_array(720, time_teile,720)
 
