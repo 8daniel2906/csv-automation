@@ -8,44 +8,66 @@ import sklearn
 print(sklearn.__version__)#1.7.0
 
 #######################################################################
-def get_prediction_interval_with_timebins(pred_serie, kmeans, q_lo_dict, q_hi_dict,
-                                          time_bins, chunk_size):
-    lo_list = []
-    hi_list = []
-
-    for start in range(0, len(pred_serie), chunk_size):
+def assign_clusters_inference(prediction, chunk_size, trained_kmeans):
+    chunks = []
+    chunk_ranges = []
+    for start in range(0, len(prediction), chunk_size):
         end = start + chunk_size
-        if end > len(pred_serie):
-            break
+        if end <= len(prediction):
+            chunks.append(prediction[start:end])
+            chunk_ranges.append((start, end))
+    chunks = np.array(chunks)
+    predicted_labels = trained_kmeans.predict(chunks)
+    cluster_labels = np.full(len(prediction), np.nan)
+    for i, (start, end) in enumerate(chunk_ranges):
+        cluster_labels[start:end] = predicted_labels[i]
+    return cluster_labels
 
-        chunk = pred_serie[start:end]
-        cluster = kmeans.predict([chunk])[0]
 
-        time_center = (start + end) // 2
-        time_bin = np.digitize(time_center, time_bins, right=False) - 1
 
-        q_lo = q_lo_dict.get((time_bin, cluster), 0)
-        q_hi = q_hi_dict.get((time_bin, cluster), 0)
+def assign_time_bins_full_array(array_len, n_bins, packet_size):
+    import numpy as np
 
-        lo_list.extend([q_lo] * chunk_size)
-        hi_list.extend([q_hi] * chunk_size)
+    assert array_len % packet_size == 0, f"Länge muss ein Vielfaches von {packet_size} sein!"
 
-    return np.array(lo_list), np.array(hi_list)
+    full_time_bin_array = []
+
+    for packet_start in range(0, array_len, packet_size):
+        time_bins = np.linspace(0, packet_size, n_bins + 1)
+        # Lokale Indizes innerhalb des Pakets (0–719)
+        local_indices = np.arange(packet_size)
+        local_bins = np.digitize(local_indices, time_bins, right=False) - 1
+        full_time_bin_array.extend(local_bins)
+
+    return np.array(full_time_bin_array)
+
+def get_quantile_bounds_from_labels(cluster_labels, time_labels, interval_matrix):
+    assert len(cluster_labels) == len(time_labels), "Label-Arrays müssen gleich lang sein."
+
+    lo_array = np.full(len(cluster_labels), np.nan)
+    hi_array = np.full(len(cluster_labels), np.nan)
+
+    for i in range(len(cluster_labels)):
+        c = int(cluster_labels[i])
+        t = int(time_labels[i])
+        if not (np.isnan(c) or np.isnan(t)):
+            lo, hi = interval_matrix[c][t]
+            lo_array[i] = lo
+            hi_array[i] = hi
+
+    return lo_array, hi_array
 # Laden
 model_bundle = joblib.load('kmeans_interval_model7.pkl')
 # Zugriff auf Inhalte
 kmeans = model_bundle['kmeans']
-q_lo_dict = model_bundle['q_lo_dict']
-q_hi_dict = model_bundle['q_hi_dict']
-time_bins = model_bundle['time_bins']
-chunk_size = model_bundle['chunk_size']
-print(chunk_size)
-#model_bundle = joblib.load("kmeans_interval_model4.pkl")
+interval_matrix = model_bundle['interval_matrix']
+prediction1 = model_bundle['prediction1']
 
+chunk = 180
+cluster = 10
+time_bins = 10
 
-#data = np.load("quantile_dicts.npz", allow_pickle=True)
-#q_lo_dict = data["q_lo"].item()
-#q_hi_dict = data["q_hi"].item()
+time_labels_klein = assign_time_bins_full_array(720, time_teile,720)
 
 ###################################################################################
 
@@ -160,7 +182,8 @@ for i in range(2): # funktioniert nur wenn input größer ist als output
     input = input[360:]
     input = np.concatenate((array[-840+(i+1)*360, :12].reshape(12,),input)) #wegen der zeile wird das nicht unendlich autoregressiv laufen, dafür gehen die 9 datumswerte aus
 
-q_low, q_up = get_prediction_interval_with_timebins(arr*1000, kmeans, q_lo_dict, q_hi_dict, time_bins, chunk_size)
+cluster_labels2 = assign_clusters_inference(arr*100, chunk, kmeans)
+q_low, q_up = get_quantile_bounds_from_labels(cluster_labels2, time_labels_klein, interval_matrix)
 lower = arr*1000 - np.abs(q_low)
 upper = arr*1000 + np.abs(q_up)
 
@@ -205,7 +228,8 @@ for i in range(range_loop):
         temp_arr = np.concatenate((array[(12 * i) * 60 + (j + 1) * 360, :12].reshape(12, ), temp_arr))
         #print(temp_arr.shape)
 
-    q_low_hist, q_up_hist = get_prediction_interval_with_timebins(historic_prediction * 1000, kmeans, q_lo_dict, q_hi_dict, time_bins, chunk_size)
+    cluster_labels2 = assign_clusters_inference(1000*historic_prediction, chunk, kmeans)  # chunk, kmeans global
+    q_low_hist, q_up_hist = get_quantile_bounds_from_labels(cluster_labels2, time_labels_klein, interval_matrix)
     lower_hist = historic_prediction * 1000 - np.abs(q_low_hist)
     upper_hist = historic_prediction * 1000 + np.abs(q_up_hist)
     lower_hist_.append(lower_hist)
