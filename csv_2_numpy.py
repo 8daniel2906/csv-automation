@@ -61,7 +61,7 @@ model_bundle = joblib.load('kmeans_10cl_10timebin_180chunk_90%e_80%PI_750schwell
 # Zugriff auf Inhalte
 kmeans = model_bundle['kmeans']
 interval_matrix = model_bundle['interval_matrix']
-prediction1 = model_bundle['prediction1']
+#prediction1 = model_bundle['prediction1']
 
 chunk = 180
 cluster = 10
