@@ -42,7 +42,7 @@ fig1.add_trace(go.Scatter(
     fill='tonexty',
     fillcolor='rgba(255,165,0,0.3)',  # Orange mit alpha 0.3
     line=dict(width=0),
-    name=' 90% Prädiktionsintervall'
+    name=' 80% Prädiktionsintervall'
 ))
 
 fig1.update_layout(
@@ -110,7 +110,7 @@ fig2.add_trace(go.Scatter(
     x=time_1,
     y=lower_historic,
     mode='lines',
-    name=f'Untergrenze 90%-Intervall',
+    name=f'Untergrenze 80%-Intervall',
     line=dict(color='rgba(0, 255, 0, 0)'),  # Unsichtbare Linie
     showlegend=False
 ))
@@ -120,7 +120,7 @@ fig2.add_trace(go.Scatter(
     x=time_1,
     y=upper_historic,
     mode='lines',
-    name=f'90%-Prädiktionsintervall <br>Hit-Rate: {np.round(hit_rate*100,2)}% <br>Ø Intervallbreite: {summe}cm',
+    name=f'80%-Prädiktionsintervall <br>Hit-Rate: {np.round(hit_rate*100,2)}% <br>Ø Intervallbreite: {summe}cm',
     line=dict(color='green', width=0.1),
     fill='tonexty',
     fillcolor='rgba(0, 255, 0, 0.2)'  # Transparente grüne Füllung
