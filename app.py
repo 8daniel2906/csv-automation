@@ -75,8 +75,7 @@ count_inside = np.sum(inside)
 total = len(Wasserstand_der_letzten_Woche)
 hit_rate = count_inside / total
 summe = np.sum(upper_historic - lower_historic)/total
-print('hitrate', hit_rate)
-print("summe", summe)
+
 
 
 # Erzeuge Zeitstempel für Plot 2
@@ -90,21 +89,7 @@ fig2.add_trace(go.Scatter(x=time_1, y=Fehler_pro_Messung, mode='lines',
                           name=f'Vorhersagefehler <br>Ø Vorhersagefehler: {array_mean[0]:.2f}cm <br>MAX. Vorhersagefehler: {array_max[0]:.2f}cm',
                           line=dict(color='orange', width = 0.5)))
 
-#fig2.add_trace(go.Scatter(
-  #  x=time_1,
-  #  y=lower_historic,
-  #  mode='lines',
-  #  name=f'Obergrenze 90%-Intervall <br> Hit-Rate: {hit_rate}%',  # Optional: beschreibe die Linie sinnvoll
-  #  line=dict(color='green', width=0.1)
-#))
 
-#fig2.add_trace(go.Scatter(
- #   x=time_1,
- #   y=upper_historic,
- #   mode='lines',
- #   name=f'Untergrenze 90%-Intervall <br> Ø Intervallbreite: {Summe}cm',  # Optional: beschreibe die Linie sinnvoll
- #   line=dict(color='green', width=0.1)
-#))
 # Zuerst die untere Linie zeichnen (kein Fill)
 fig2.add_trace(go.Scatter(
     x=time_1,
