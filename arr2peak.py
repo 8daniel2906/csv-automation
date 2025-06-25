@@ -33,14 +33,33 @@ def timestamp_generator(timestamp_first, steps, p, h):
         arr.append(timestamps_array)
 
     return arr
+def warnung_generator(upper_peak, hist_peak):
+    schwelle = 750 #das ist PI-model abhängig und kmeans abhängig
+    hist_peak = np.array(hist_peak)
+    upper_peak = np.array(upper_peak)
+    mask11 = hist_peak >= schwelle      # Ground Truth: Überschwemmung
+    mask12 = hist_peak < schwelle       # Ground Truth: keine Überschwemmung
 
-p = np.load("historic_predictions.npy")
-h = np.load("historic_data.npy")
+    mask21 = upper_peak >= schwelle     # Prediction: Warnung
+    mask22 = upper_peak < schwelle      # Prediction: keine Warnung
+
+        # TP, FN, FP, TN
+    TP = np.sum(mask11 & mask21)
+    FN = np.sum(mask11 & mask22)
+    FP = np.sum(mask12 & mask21)
+    TN = np.sum(mask12 & mask22)
+
+    print(f"Warn.und HW.: {TP}, Entwarn. aber HW: {FN}, Warn. aber K.HW: {FP}, Entwarn. und K. HW: {TN} ")
+
+
+
+p = np.load("upper_historic.npy")
+h = np.load("historic_predictions.npy")
 timestamps = np.load("timestamps.npy", allow_pickle=True)
-p_trunc, h_trunc, pred_peak, hist_peak, steps = arr2peak(p, h)
-arr = timestamp_generator(timestamps[0], steps, pred_peak, hist_peak)
+u_trunc, h_trunc, upper_peak, hist_peak, steps = arr2peak(p, h)
+arr = timestamp_generator(timestamps[0], steps, upper_peak, hist_peak)
 arr = np.array(arr)
-p_trunc = np.array(p_trunc)
-print(p_trunc.shape)
+
+warnung_generator(upper_peak, hist_peak)
 
 
