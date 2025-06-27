@@ -10,6 +10,18 @@ import joblib
 import sklearn
 import matplotlib.pyplot as plt
 
+############################
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse, StreamingResponse
+import io
+
+app = FastAPI()
+
+@app.get("/")
+def read_root():
+    return {"message": "API läuft!"}
+#############################
+
 #jetzt = datetime.now() # in format beispielsweise: 2025-03-06T00:00:00
 api_url_template = "https://api.opensensorweb.de/v1/organizations/open/networks/BAFG/devices/5952025/sensors/W/measurements/raw?start={start}%2B02:00&end={end}%2B02:00&interpolator=LINEAR"
 
@@ -214,7 +226,7 @@ def inference(steps, array, start):
 #benötigte Daten wegen training: stunden_zurück([stunden_zurück(stunden_danach(db, 1), 12)], 14) , ..., stunden_zurück([stunden_zurück(stunden_danach(db, k), 12)], 14)
 # api-pull wäre dann: osw_api_extract( stunden_zurück(db, 25) , fast_now() ) ---- wenn db der letze ende eintrag war
 
-db_ende = stunden_zurueck(fast_now(), 600)
+db_ende = stunden_zurueck(fast_now(), 6)
 db_start = stunden_zurueck(db_ende, 12)
 json_daten = osw_api_extract(stunden_zurueck(db_ende, 25), fast_now(), api_url_template)
 df = json_to_dataframe(json_daten, spalten_umbenennung={"begin": "Zeit", "v": "Wert"})
@@ -223,10 +235,35 @@ df3 = df_feature_engineering(df2)
 steps = int(stunden_diff(db_ende, fast_now()))
 results = inference(steps, df3, stunden_danach(db_start, 1))
 
-for j in range(steps):
-    print(results[j][0])
-    print(results[j][1])
 
+##############
+@app.get("/predict")
+def predict():
+    # Deine Berechnungen wie bisher
+    db_ende = stunden_zurueck(fast_now(), 6)
+    db_start = stunden_zurueck(db_ende, 12)
+    json_daten = osw_api_extract(stunden_zurueck(db_ende, 25), fast_now(), api_url_template)
+    df = json_to_dataframe(json_daten, spalten_umbenennung={"begin": "Zeit", "v": "Wert"})
+    df2 = df_cleansing(df)
+    df3 = df_feature_engineering(df2)
+    steps = int(stunden_diff(db_ende, fast_now()))
+    results = inference(steps, df3, stunden_danach(db_start, 1))
 
+    # Ausgabe als JSON (z. B. nur Timestamps + Prediction)
+    output = []
+    for j in range(steps):
+        output.append({
+            "start": results[j][0],
+            "end": results[j][1],
+            "prediction": results[j][2].tolist(),
+            "vergleich": results[j][3].tolist(),
+            "lower_bound": results[j][4].tolist(),
+            "upper_bound": results[j][5].tolist(),
+        })
+
+    return JSONResponse(content=output)
+########################
+
+#uvicorn api:app --host 0.0.0.0 --port $PORT
 
 
