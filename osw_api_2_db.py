@@ -9,8 +9,10 @@ from tensorflow.keras.losses import MeanSquaredError
 import joblib
 import sklearn
 import matplotlib.pyplot as plt
+import psycopg2 as psy
+from api import api_url_template
 
-
+conn_str = "postgresql://neondb_owner:npg_mPqZi9CG2txF@ep-divine-mud-a90zxdvg-pooler.gwc.azure.neon.tech/neondb?sslmode=require&channel_binding=require"
 #jetzt = datetime.now() # in format beispielsweise: 2025-03-06T00:00:00
 api_url_template = "https://api.opensensorweb.de/v1/organizations/open/networks/BAFG/devices/5952025/sensors/W/measurements/raw?start={start}%2B02:00&end={end}%2B02:00&interpolator=LINEAR"
 
@@ -44,7 +46,7 @@ def osw_api_extract(anfang: str, ende: str, api_url_template: str):
     response = requests.get(api_url)  # anfrage an die api wird in response gesaved
     json = response.json()
     return json
-import pandas as pd
+
 
 def json_to_dataframe(json_data, spalten_umbenennung=None):
     df = pd.DataFrame(json_data)
@@ -183,6 +185,7 @@ def inference(steps, array, start):
     results = []
     model, kmeans, interval_matrix, chunk, cluster, time_teile, time_labels_klein = get_models()
 
+
     for i in range(steps):
         historic_datum = array[ i * 60, :12].reshape(12, )
         historic_stand = array[ i * 60 : ( i * 60) + 840, 12].reshape(840, )
@@ -205,8 +208,9 @@ def inference(steps, array, start):
         zeit1 = start
         zeit2 = stunden_danach(start, 12)
         start = stunden_danach(start, 1)
-        zeile = [zeit1, zeit2, np.array(historic_prediction), np.array(historic_vergleich), np.array(lower_hist), np.array(upper_hist)]
+        zeile = [zeit1, zeit2, np.max(np.array(historic_vergleich)), np.max(np.array(upper_hist)), np.array(historic_prediction), np.array(historic_vergleich), np.array(lower_hist), np.array(upper_hist)]
         results.append(zeile)
+
     return results
 
 # der letzte ende-eintrag der db: stunden_zurueck(fast_now(), k),  und der maximal neuste ende einträg wäre fast_now() ---> fehlen k einträge
@@ -214,13 +218,142 @@ def inference(steps, array, start):
 #benötigte start-zeiträume: stunden_zurück(stunden_danach(db, 1), 12), ..., stunden_zurück(stunden_danach(db, k), 12)
 #benötigte Daten wegen training: stunden_zurück([stunden_zurück(stunden_danach(db, 1), 12)], 14) , ..., stunden_zurück([stunden_zurück(stunden_danach(db, k), 12)], 14)
 # api-pull wäre dann: osw_api_extract( stunden_zurück(db, 25) , fast_now() ) ---- wenn db der letze ende eintrag war
+#test = stunden_zurueck(fast_now(), 600)
+#db_ende = stunden_zurueck(test, 3)
+#db_start = stunden_zurueck(db_ende, 12)
+#json_daten = osw_api_extract(stunden_zurueck(db_ende, 25), test, api_url_template)
+#df = json_to_dataframe(json_daten, spalten_umbenennung={"begin": "Zeit", "v": "Wert"})
+#df2 = df_cleansing(df)
+#df3 = df_feature_engineering(df2)
+#steps = int(stunden_diff(db_ende, test))
+#results = inference(steps, df3, stunden_danach(db_start, 1))
 
-db_ende = stunden_zurueck(fast_now(), 6)
-db_start = stunden_zurueck(db_ende, 12)
-json_daten = osw_api_extract(stunden_zurueck(db_ende, 25), fast_now(), api_url_template)
-df = json_to_dataframe(json_daten, spalten_umbenennung={"begin": "Zeit", "v": "Wert"})
-df2 = df_cleansing(df)
-df3 = df_feature_engineering(df2)
-steps = int(stunden_diff(db_ende, fast_now()))
-results = inference(steps, df3, stunden_danach(db_start, 1))
+def extract_and_tranform(zeitpunkt1, zeitpunkt2, api_template ):
 
+    db_ende =  zeitpunkt1
+    db_start = stunden_zurueck(db_ende, 12)
+    json_daten = osw_api_extract(stunden_zurueck(db_ende, 25), zeitpunkt2, api_url_template)
+    df = json_to_dataframe(json_daten, spalten_umbenennung={"begin": "Zeit", "v": "Wert"})
+    df2 = df_cleansing(df)
+    df3 = df_feature_engineering(df2)
+    steps = int(stunden_diff(db_ende, zeitpunkt2))
+    results = inference(steps, df3, stunden_danach(db_start, 1))
+
+    return results
+
+def get_latest_endzeitpunkt_iso(conn_str):
+    query = "SELECT MAX(endzeit) FROM zeitreihe_metadata;"
+    try:
+        with psy.connect(conn_str) as conn:
+            with conn.cursor() as cur:
+                cur.execute(query)
+                result = cur.fetchone()[0]
+                if result:
+                    # In ISO-Format umwandeln: 2025-03-06T00:00:00
+                    return result.strftime("%Y-%m-%dT%H:%M:%S")
+                else:
+                    return None  # Falls Tabelle leer
+    except Exception as e:
+        print(f"Fehler: {e}")
+        return None
+
+def load_in_db(conn_str, results):
+    with psy.connect(conn_str) as conn:
+        with conn.cursor() as cur:
+            for zeile in results:
+                zeit1 = zeile[0]
+                zeit2 = zeile[1]
+                max_vergleich = zeile[2]
+                max_upper = zeile[3]
+                prediction = zeile[4]
+                vergleich = zeile[5]
+                lower = zeile[6]
+                upper = zeile[7]
+
+                # Prüfen, ob Kombination bereits vorhanden ist
+                cur.execute("""
+                    SELECT id FROM zeitreihe_metadata
+                    WHERE startzeit = %s AND endzeit = %s
+                """, (zeit1, zeit2))
+                exists = cur.fetchone()
+
+                if exists:
+                    print(f"⚠️ Kombination {zeit1} - {zeit2} existiert bereits. Skip.")
+                    continue
+
+                # Insert in metadata
+                cur.execute("""
+                    INSERT INTO zeitreihe_metadata (startzeit, endzeit, max_value_historic, max_value_upperpi_80_perc)
+                    VALUES (%s, %s, %s, %s)
+                    RETURNING id
+                """, (zeit1, zeit2, round(max_vergleich, 2), round(max_upper, 2)))
+                metadata_id = cur.fetchone()[0]
+
+                datenpunkte = []
+                for minute in range(720):
+                    wert_pred = round(prediction[minute], 2)
+                    wert_vergl = round(vergleich[minute], 2)
+                    wert_lower = round(lower[minute], 2)
+                    wert_upper = round(upper[minute], 2)
+                    datenpunkte.append((metadata_id, minute, wert_pred, wert_vergl, wert_lower, wert_upper))
+
+                # Bulk insert Zeitreihen
+                cur.executemany("""
+                    INSERT INTO zeitreihe_daten
+                    (metadata_id, minute_value, prediction_value, historic_value, lowerpi_value, upperpi_value)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                """, datenpunkte)
+                print("done")
+
+            conn.commit()
+
+
+import io
+
+def load_in_db2(conn_str, results):
+    with psy.connect(conn_str) as conn:
+        with conn.cursor() as cur:
+            # Vorhandene Kombinationen laden
+            cur.execute("SELECT startzeit, endzeit FROM zeitreihe_metadata")
+            vorhandene = set(cur.fetchall())
+
+            buffer = io.StringIO()
+
+            for zeile in results:
+                zeit1, zeit2, max_vergleich, max_upper, prediction, vergleich, lower, upper = zeile
+
+                if (zeit1, zeit2) in vorhandene:
+                    print(f"⚠️ Kombination {zeit1} - {zeit2} existiert bereits. Skip.")
+                    continue
+
+                # Metadata insert
+                cur.execute("""
+                    INSERT INTO zeitreihe_metadata (startzeit, endzeit, max_value_historic, max_value_upperpi_80_perc)
+                    VALUES (%s, %s, %s, %s)
+                    RETURNING id
+                """, (zeit1, zeit2, int(max_vergleich), int(max_upper)))
+                metadata_id = cur.fetchone()[0]
+
+                for i in range(144):
+                    buffer.write(f"{metadata_id}\t{i}\t{round(prediction[i*5], 1)}\t{round(vergleich[i*5], 1)}\t{round(lower[i*5], 1)}\t{round(upper[i*5], 1)}\n")
+
+                print(f"✅ Metadata ID {metadata_id} vorbereitet.")
+
+            buffer.seek(0)
+
+            cur.copy_from(
+                buffer,
+                'zeitreihe_daten',
+                sep='\t',
+                columns=('metadata_id', 'minute_value', 'prediction_value', 'historic_value', 'lowerpi_value', 'upperpi_value')
+            )
+
+            conn.commit()
+
+            print("✅ Alle Daten mit COPY (psycopg2) eingespielt.")
+
+
+#iso_date = get_latest_endzeitpunkt_iso(conn_str)
+iso_date = stunden_zurueck(fast_now(),3500)
+results = extract_and_tranform(iso_date, fast_now(), api_url_template)
+load_in_db2(conn_str, results)
