@@ -132,3 +132,13 @@ fig2.update_layout(
 )
 
 st.plotly_chart(fig2)
+
+if st.button('API aufrufen'):
+    # API-Request machen (GET-Beispiel)
+    response = requests.get('http://127.0.0.1:8000/download-excel')
+
+    if response.status_code == 200:
+        st.success('API erfolgreich aufgerufen!')
+        st.json(response.json())  # Zeigt die Antwort als JSON an
+    else:
+        st.error(f'Fehler: {response.status_code}')
