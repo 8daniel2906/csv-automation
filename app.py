@@ -138,7 +138,7 @@ import streamlit as st
 import requests
 
 if st.button('Excel-File downloaden für den Zeitraum'):
-    response = requests.get('http://127.0.0.1:8000/download-excel')
+    response = requests.get('https://image-api-latest-1.onrender.com/download-excel')
     if response.status_code == 200:
         st.download_button(
             label="Excel-Datei herunterladen",
