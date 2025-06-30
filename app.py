@@ -134,12 +134,17 @@ fig2.update_layout(
 
 st.plotly_chart(fig2)
 
-if st.button('Excel-File downloaden für den Zeitraum'):
-    # API-Request machen (GET-Beispiel)
-    response = requests.get('http://127.0.0.1:8000/download-excel')
+import streamlit as st
+import requests
 
+if st.button('Excel-File downloaden für den Zeitraum'):
+    response = requests.get('http://127.0.0.1:8000/download-excel')
     if response.status_code == 200:
-        st.success('API erfolgreich aufgerufen!')
-        st.json(response.json())  # Zeigt die Antwort als JSON an
+        st.download_button(
+            label="Excel-Datei herunterladen",
+            data=response.content,
+            file_name="report.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
     else:
-        st.error(f'Fehler: {response.status_code}')
+        st.error("Fehler beim Laden der Datei")
