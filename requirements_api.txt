@@ -5,5 +5,5 @@ pandas
 fastapi
 uvicorn[standard]
 openpyxl
-pandas
-os
+
+
