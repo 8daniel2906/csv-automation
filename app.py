@@ -2,6 +2,7 @@ import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
 import pandas as pd
+import requests
 
 timestamps_array = np.load('timestamps.npy', allow_pickle=True)
 
@@ -133,7 +134,7 @@ fig2.update_layout(
 
 st.plotly_chart(fig2)
 
-if st.button('API aufrufen'):
+if st.button('Excel-File downloaden für den Zeitraum'):
     # API-Request machen (GET-Beispiel)
     response = requests.get('http://127.0.0.1:8000/download-excel')
 
