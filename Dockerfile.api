@@ -1,0 +1,21 @@
+# Basis-Image
+FROM python:3.11-slim
+
+# System-Pakete installieren
+RUN apt-get update && \
+    apt-get install -y build-essential libpq-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# Arbeitsverzeichnis
+WORKDIR /app
+
+# Requirements kopieren & installieren
+COPY requirements_api.txt .
+RUN pip install --upgrade pip
+RUN pip install -r requirements_api.txt
+
+# Projektdateien kopieren
+COPY . .
+
+# Falls du sofort ausführen möchtest (z. B. beim Start Container)
+CMD ["python", "db_2_excel.py"]
