@@ -10,6 +10,7 @@ import pandas as pd
 import io
 import uvicorn
 import os
+from pydantic import BaseModel
 
 
 
@@ -205,7 +206,7 @@ end_iso = "2025-06-2T00:00:00"
 
 app = FastAPI()
 @app.get("/download-excel")
-def download_excel():
+def download_excel2():
     conn_str = "postgresql://neondb_owner:npg_mPqZi9CG2txF@ep-divine-mud-a90zxdvg-pooler.gwc.azure.neon.tech/neondb?sslmode=require&channel_binding=require"
 
 
@@ -227,6 +228,33 @@ def download_excel():
         media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         headers={"Content-Disposition": "attachment; filename=report.xlsx"}
     )
+
+
+class TimeRange(BaseModel):
+    start_iso: str
+    end_iso: str
+
+@app.post("/download-excel")
+def download_excel(time_range: TimeRange):
+    conn_str = "postgresql://neondb_owner:...your_connection_string..."
+
+    results = np.array(load_time_series(conn_str, time_range.start_iso, time_range.end_iso))
+    pred, hist, lower, upper = extract_and_stretch(results)
+
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        pd.DataFrame(pred).to_excel(writer, sheet_name='Predictions')
+        pd.DataFrame(hist).to_excel(writer, sheet_name='History')
+        # weitere Tabellen hinzufügen
+
+    output.seek(0)
+
+    return StreamingResponse(
+        output,
+        media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        headers={"Content-Disposition": "attachment; filename=report.xlsx"}
+    )
+
 
 import uvicorn
 if __name__ == "__main__":

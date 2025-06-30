@@ -3,6 +3,7 @@ import numpy as np
 import plotly.graph_objects as go
 import pandas as pd
 import requests
+from datetime import datetime, time
 
 timestamps_array = np.load('timestamps.npy', allow_pickle=True)
 
@@ -133,12 +134,34 @@ fig2.update_layout(
 )
 
 st.plotly_chart(fig2)
+##############################################################################################
 
-import streamlit as st
-import requests
+st.title("Zeitraum-Auswahl")
+
+# Startdatum & -zeit
+start_date = st.date_input("Startdatum", value=datetime.today())
+start_hour = st.number_input("Startstunde (0-23)", min_value=0, max_value=23, value=0, step=1)
+
+# Enddatum & -zeit
+end_date = st.date_input("Enddatum", value=datetime.today())
+end_hour = st.number_input("Endstunde (0-23)", min_value=0, max_value=23, value=23, step=1)
+
+# Kombiniere Datum und Stunde zu datetime-Objekten
+start_datetime = datetime.combine(start_date, time(start_hour, 0))
+end_datetime = datetime.combine(end_date, time(end_hour, 0))
+
+st.write(f"Startzeit: {start_datetime}")
+st.write(f"Endzeit: {end_datetime}")
 
 if st.button('Excel-File downloaden für den Zeitraum'):
-    response = requests.get('https://image-api-latest-1.onrender.com/download-excel')
+    # Zeiten im ISO-Format als String
+    start_iso = start_datetime.isoformat()
+    end_iso = end_datetime.isoformat()
+
+    json_data = {"start_iso": start_iso, "end_iso": end_iso}
+
+    response = requests.post('https://image-api-latest-1.onrender.com/download-excel', json=json_data)
+
     if response.status_code == 200:
         st.download_button(
             label="Excel-Datei herunterladen",
@@ -147,4 +170,4 @@ if st.button('Excel-File downloaden für den Zeitraum'):
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
     else:
-        st.error("Fehler beim Laden der Datei")
+        st.error(f"Fehler beim Laden der Datei: {response.status_code}")
