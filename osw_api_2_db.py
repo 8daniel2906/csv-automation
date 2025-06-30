@@ -18,7 +18,7 @@ api_url_template = "https://api.opensensorweb.de/v1/organizations/open/networks/
 
 def fast_now():
     now = datetime.now()
-    fast_now = now.replace(minute=0, second=0, microsecond=0) - timedelta(hours=2)
+    fast_now = now.replace(minute=0, second=0, microsecond=0) - timedelta(hours=1)
     return fast_now.isoformat()
 #macht die jetzige zeit auf minute bis sekunde 00:00 und 2 stunden zurück
 def date_2_iso(jahr: int, monat: int, tag: int, stunde: int) -> str:
