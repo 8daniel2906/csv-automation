@@ -236,7 +236,6 @@ class TimeRange(BaseModel):
 
 @app.post("/download-excel")
 def download_excel(time_range: TimeRange):
-    conn_str = "postgresql://neondb_owner:...your_connection_string..."
 
     results = np.array(load_time_series(conn_str, time_range.start_iso, time_range.end_iso))
     pred, hist, lower, upper = extract_and_stretch(results)
