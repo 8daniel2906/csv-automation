@@ -191,16 +191,14 @@ def export_to_excel_with_chart(pred, hist, lower, upper, filename="zeitreihe.xls
     print(f"✅ Excel-Datei mit Diagramm gespeichert: {filename}")
     return filename
 
-
-conn_str = "postgresql://neondb_owner:npg_mPqZi9CG2txF@ep-divine-mud-a90zxdvg-pooler.gwc.azure.neon.tech/neondb?sslmode=require&channel_binding=require"
 conn_str = "postgresql://neondb_owner:npg_mPqZi9CG2txF@ep-divine-mud-a90zxdvg-pooler.gwc.azure.neon.tech/neondb?sslmode=require&channel_binding=require"
 start_iso = "2025-06-01T00:00:00"
 end_iso = "2025-06-2T00:00:00"
-results = np.array(load_time_series(conn_str, start_iso, end_iso))
-pred, hist, lower, upper  = extract_and_stretch(results)
-plot_time_series(pred, hist, lower, upper, save_path="time_series_plot.png")
-excel_path = export_to_excel_with_chart(pred, hist, lower, upper, filename="time_series_data2.xlsx")
-print(excel_path)
+#results = np.array(load_time_series(conn_str, start_iso, end_iso))
+#pred, hist, lower, upper  = extract_and_stretch(results)
+#plot_time_series(pred, hist, lower, upper, save_path="time_series_plot.png")
+#excel_path = export_to_excel_with_chart(pred, hist, lower, upper, filename="time_series_data2.xlsx")
+#print(excel_path)
 
 
 
@@ -231,4 +229,6 @@ def download_excel():
 
 import uvicorn
 if __name__ == "__main__":
-    uvicorn.run("db_2_excel:app", host="127.0.0.1", port=8000, reload=True)
+    #uvicorn.run("db_2_excel:app", host="127.0.0.1", port=8000, reload=True)
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("db_2_excel:app", host="0.0.0.0", port=port, reload=True)
