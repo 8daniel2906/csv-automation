@@ -1,0 +1,12 @@
+name: Run image_cron manually
+
+on:
+  workflow_dispatch:   # Manuelles Auslösen
+
+jobs:
+  run-image-cron:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run image_cron Docker image
+        run: docker run --rm ghcr.io/8daniel2906/image_cron:latest
