@@ -3,6 +3,13 @@ from datetime import datetime
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+from fastapi import FastAPI
+from fastapi.responses import FileResponse
+from fastapi.responses import StreamingResponse
+import pandas as pd
+import io
+
+app = FastAPI()
 
 def load_time_series(conn_str, startzeit_iso, endzeit_iso):
     with psy.connect(conn_str) as conn:
@@ -181,19 +188,41 @@ def export_to_excel_with_chart(pred, hist, lower, upper, filename="zeitreihe.xls
     # Speichern
     wb.save(filename)
     print(f"✅ Excel-Datei mit Diagramm gespeichert: {filename}")
+    return filename
 
 
 conn_str = "postgresql://neondb_owner:npg_mPqZi9CG2txF@ep-divine-mud-a90zxdvg-pooler.gwc.azure.neon.tech/neondb?sslmode=require&channel_binding=require"
-if __name__ == "__main__":
+
+conn_str = "postgresql://neondb_owner:npg_mPqZi9CG2txF@ep-divine-mud-a90zxdvg-pooler.gwc.azure.neon.tech/neondb?sslmode=require&channel_binding=require"
+start_iso = "2025-06-01T00:00:00"
+end_iso = "2025-06-2T00:00:00"
+
+results = np.array(load_time_series(conn_str, start_iso, end_iso))
+pred, hist, lower, upper  = extract_and_stretch(results)
+plot_time_series(pred, hist, lower, upper, save_path="time_series_plot.png")
+excel_path = export_to_excel_with_chart(pred, hist, lower, upper, filename="time_series_data2.xlsx")
+print(excel_path)
+app = FastAPI()
+@app.get("/download-excel")
+def download_excel():
     conn_str = "postgresql://neondb_owner:npg_mPqZi9CG2txF@ep-divine-mud-a90zxdvg-pooler.gwc.azure.neon.tech/neondb?sslmode=require&channel_binding=require"
-    start_iso = "2025-06-01T00:00:00"
-    end_iso = "2025-06-2T00:00:00"
++
 
     results = np.array(load_time_series(conn_str, start_iso, end_iso))
-    pred, hist, lower, upper  = extract_and_stretch(results)
-    # Plot speichern
-    plot_time_series(pred, hist, lower, upper, save_path="time_series_plot.png")
+    pred, hist, lower, upper = extract_and_stretch(results)
 
-    # Daten in Excel speichern
-    #save_to_excel(pred, hist, lower, upper, filename="time_series_data.xlsx")
-    export_to_excel_with_chart(pred, hist, lower, upper, filename="time_series_data2.xlsx")
+    # Statt Dateipfad -> BytesIO
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        # Beispiel: deine Daten in Excel schreiben
+        pd.DataFrame(pred).to_excel(writer, sheet_name='Predictions')
+        pd.DataFrame(hist).to_excel(writer, sheet_name='History')
+        # du kannst hier beliebig Tabellen hinzufügen
+
+    output.seek(0)  # ganz wichtig!
+
+    return StreamingResponse(
+        output,
+        media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        headers={"Content-Disposition": "attachment; filename=report.xlsx"}
+    )

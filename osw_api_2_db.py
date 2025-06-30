@@ -353,7 +353,12 @@ def load_in_db2(conn_str, results):
             print("✅ Alle Daten mit COPY (psycopg2) eingespielt.")
 
 
-iso_date = get_latest_endzeitpunkt_iso(conn_str)
+#iso_date = get_latest_endzeitpunkt_iso(conn_str)
 #iso_date = stunden_zurueck(fast_now(),3500)
-results = extract_and_tranform(iso_date, fast_now(), api_url_template)
-load_in_db2(conn_str, results)
+#results = extract_and_tranform(iso_date, fast_now(), api_url_template)
+#load_in_db2(conn_str, results)
+
+if __name__ == "__main__":
+    iso_date = get_latest_endzeitpunkt_iso(conn_str)
+    results = extract_and_tranform(iso_date, fast_now(), api_url_template)
+    load_in_db2(conn_str, results)
