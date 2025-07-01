@@ -25,8 +25,8 @@ import psycopg2 as psy
 
 
 ###############################################################################
-jetzt = datetime.now() # in format beispielsweise: 2025-03-06T00:00:00
-jetzt = jetzt.isoformat()
+#jetzt = datetime.now() # in format beispielsweise: 2025-03-06T00:00:00
+#jetzt = jetzt.isoformat()
 api_url_template = "https://api.opensensorweb.de/v1/organizations/open/networks/BAFG/devices/5952025/sensors/W/measurements/raw?start={start}%2B02:00&end={end}%2B02:00&interpolator=LINEAR"
 
 def fast_now():
@@ -225,9 +225,11 @@ def inference_live(array, start):
     return results
 
 
-def extract_and_tranform_live():
+def extract_and_transform_live():
+    jetzt = datetime.now()  # in format beispielsweise: 2025-03-06T00:00:00
+    jetzt = jetzt.isoformat()
 
-    zeit1 =  stunden_zurueck(jetzt, 26)
+    zeit1 =  stunden_zurueck(jetzt, 12)
     json_daten = osw_api_extract(zeit1, jetzt, api_url_template)
     df = json_to_dataframe(json_daten, spalten_umbenennung={"begin": "Zeit", "v": "Wert"})
     df2 = df_cleansing(df)
@@ -489,7 +491,7 @@ def download_excel(time_range: TimeRange):
 
 @app.get("/get-live")
 def live():
-    results = extract_and_tranform_live()
+    results = extract_and_transform_live()
     result_json_ready = []
     for zeile in results:
         result_json_ready.append({
