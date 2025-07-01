@@ -1,17 +1,11 @@
-import psycopg2 as psy
-from datetime import datetime
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
+
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from fastapi.responses import StreamingResponse
-import pandas as pd
 import io
 import uvicorn
 import os
 from pydantic import BaseModel
-import pandas as pd
 from openpyxl import load_workbook
 from openpyxl.chart import LineChart, Reference
 from openpyxl.utils.dataframe import dataframe_to_rows
@@ -28,7 +22,7 @@ import joblib
 import sklearn
 import matplotlib.pyplot as plt
 import psycopg2 as psy
-from api import api_url_template
+
 
 ###############################################################################
 jetzt = datetime.now() # in format beispielsweise: 2025-03-06T00:00:00
