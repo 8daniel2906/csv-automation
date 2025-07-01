@@ -31,7 +31,7 @@ def convert_json_row_to_arrays(zeile_json: dict):
 
 
 def get_live_data():
-    response = requests.get("http://127.0.0.1:8000/get-live")
+    response = requests.get("https://image-api-latest-1.onrender.com/get-live")
     response_json = response.json()
     converted = convert_json_row_to_arrays(response_json["results"][0])
     return converted
