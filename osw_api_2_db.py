@@ -13,7 +13,7 @@ import psycopg2 as psy
 from api import api_url_template
 
 conn_str = "postgresql://neondb_owner:npg_mPqZi9CG2txF@ep-divine-mud-a90zxdvg-pooler.gwc.azure.neon.tech/neondb?sslmode=require&channel_binding=require"
-#jetzt = datetime.now() # in format beispielsweise: 2025-03-06T00:00:00
+jetzt = datetime.now() # in format beispielsweise: 2025-03-06T00:00:00
 api_url_template = "https://api.opensensorweb.de/v1/organizations/open/networks/BAFG/devices/5952025/sensors/W/measurements/raw?start={start}%2B02:00&end={end}%2B02:00&interpolator=LINEAR"
 
 def fast_now():
@@ -213,20 +213,6 @@ def inference(steps, array, start):
 
     return results
 
-# der letzte ende-eintrag der db: stunden_zurueck(fast_now(), k),  und der maximal neuste ende einträg wäre fast_now() ---> fehlen k einträge
-#benötigte ende-zeiträume: stunden_danach(db, 1), ..., stunden_danach(db, k)
-#benötigte start-zeiträume: stunden_zurück(stunden_danach(db, 1), 12), ..., stunden_zurück(stunden_danach(db, k), 12)
-#benötigte Daten wegen training: stunden_zurück([stunden_zurück(stunden_danach(db, 1), 12)], 14) , ..., stunden_zurück([stunden_zurück(stunden_danach(db, k), 12)], 14)
-# api-pull wäre dann: osw_api_extract( stunden_zurück(db, 25) , fast_now() ) ---- wenn db der letze ende eintrag war
-#test = stunden_zurueck(fast_now(), 600)
-#db_ende = stunden_zurueck(test, 3)
-#db_start = stunden_zurueck(db_ende, 12)
-#json_daten = osw_api_extract(stunden_zurueck(db_ende, 25), test, api_url_template)
-#df = json_to_dataframe(json_daten, spalten_umbenennung={"begin": "Zeit", "v": "Wert"})
-#df2 = df_cleansing(df)
-#df3 = df_feature_engineering(df2)
-#steps = int(stunden_diff(db_ende, test))
-#results = inference(steps, df3, stunden_danach(db_start, 1))
 
 def extract_and_tranform(zeitpunkt1, zeitpunkt2, api_template ):
 
@@ -353,8 +339,12 @@ def load_in_db2(conn_str, results):
             print("✅ Alle Daten mit COPY (psycopg2) eingespielt.")
 
 
+
+
+
+
 #iso_date = get_latest_endzeitpunkt_iso(conn_str)
-#iso_date = stunden_zurueck(fast_now(),3500)
+#iso_date = stunden_zurueck(jetzt,12 + 14)
 #results = extract_and_tranform(iso_date, fast_now(), api_url_template)
 #load_in_db2(conn_str, results)
 

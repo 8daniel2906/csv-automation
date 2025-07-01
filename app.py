@@ -5,6 +5,39 @@ import pandas as pd
 import requests
 from datetime import datetime, time
 
+import numpy as np
+
+def convert_json_row_to_arrays(zeile_json: dict):
+    """
+    Wandelt eine Zeile aus dem JSON (Dict) um, indem Listen in NumPy-Arrays konvertiert werden.
+
+    Args:
+        zeile_json (dict): Eine einzelne Zeile aus dem JSON-Response.
+
+    Returns:
+        dict: Zeile mit NumPy-Arrays.
+    """
+
+    # Kopiere die Zeile, damit das Original nicht verändert wird
+    zeile = zeile_json.copy()
+
+    # Konvertiere explizit die Felder
+    zeile["historic_prediction"] = np.array(zeile["historic_prediction"])
+    zeile["blaue_kurve"] = np.array(zeile["blaue_kurve"])
+    zeile["lower_hist"] = np.array(zeile["lower_hist"])
+    zeile["upper_hist"] = np.array(zeile["upper_hist"])
+
+    return zeile
+
+
+def get_live_data():
+    response = requests.get("http://127.0.0.1:8000/get-live")
+    response_json = response.json()
+    converted = convert_json_row_to_arrays(response_json["results"][0])
+    return converted
+
+converted = get_live_data()
+
 timestamps_array = np.load('timestamps.npy', allow_pickle=True)
 
 # Konvertiere den ersten Timestamp zu einem datetime-Objekt
@@ -18,6 +51,13 @@ lower = np.load('lower.npy')
 upper = np.load('upper.npy')
 lower_historic = np.load('lower_historic.npy')
 upper_historic = np.load('upper_historic.npy')
+
+first_timestamp = converted["zeit1"]
+second_timestamp = converted["zeit2"]
+array_red = converted["historic_prediction"]
+array_blue = converted["blaue_kurve"]
+upper = converted["upper_hist"]
+lower = converted["lower_hist"]
 
 # Zeitstempel für die x-Achse
 time_blue = pd.date_range(start=first_timestamp, periods=len(array_blue), freq='T')
@@ -171,3 +211,5 @@ if st.button('Excel-File downloaden für den Zeitraum'):
         )
     else:
         st.error(f"Fehler beim Laden der Datei: {response.status_code}")
+        ###########################################################################################
+
