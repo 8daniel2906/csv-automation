@@ -8,16 +8,6 @@ from datetime import datetime, time
 import numpy as np
 
 def convert_json_row_to_arrays(zeile_json: dict):
-    """
-    Wandelt eine Zeile aus dem JSON (Dict) um, indem Listen in NumPy-Arrays konvertiert werden.
-
-    Args:
-        zeile_json (dict): Eine einzelne Zeile aus dem JSON-Response.
-
-    Returns:
-        dict: Zeile mit NumPy-Arrays.
-    """
-
     # Kopiere die Zeile, damit das Original nicht verändert wird
     zeile = zeile_json.copy()
 
@@ -31,7 +21,7 @@ def convert_json_row_to_arrays(zeile_json: dict):
 
 
 def get_live_data():
-    response = requests.get("https://image-api-latest-1.onrender.com/get-live")
+    response = requests.get("https://image-api-latest-3.onrender.com/get-live")
     response_json = response.json()
     converted = convert_json_row_to_arrays(response_json["results"][0])
     return converted
@@ -200,7 +190,7 @@ if st.button('Excel-File downloaden für den Zeitraum'):
 
     json_data = {"start_iso": start_iso, "end_iso": end_iso}
 
-    response = requests.post('https://image-api-latest-1.onrender.com/download-excel', json=json_data)
+    response = requests.post('https://image-api-latest-3.onrender.com/download-excel', json=json_data)
 
     if response.status_code == 200:
         st.download_button(
