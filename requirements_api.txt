@@ -1,10 +1,14 @@
 psycopg2-binary
+fastapi
+uvicorn
+pydantic
+requests
+pandas
 numpy
 matplotlib
-pandas
-fastapi
-uvicorn[standard]
 openpyxl
-pydantic
+tensorflow
+scikit-learn
+joblib
 
 
