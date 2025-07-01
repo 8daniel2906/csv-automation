@@ -1,4 +1,4 @@
-psycopg2-binary
+ mit psycopg2-binary
 fastapi
 uvicorn
 pydantic
