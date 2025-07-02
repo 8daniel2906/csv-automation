@@ -22,12 +22,11 @@ import joblib
 import sklearn
 import matplotlib.pyplot as plt
 import psycopg2 as psy
-
-
+from zoneinfo import ZoneInfo
 ###############################################################################
-#jetzt = datetime.now() # in format beispielsweise: 2025-03-06T00:00:00
-#jetzt = jetzt.isoformat()
+
 api_url_template = "https://api.opensensorweb.de/v1/organizations/open/networks/BAFG/devices/5952025/sensors/W/measurements/raw?start={start}%2B02:00&end={end}%2B02:00&interpolator=LINEAR"
+conn_str = "postgresql://neondb_owner:npg_mPqZi9CG2txF@ep-divine-mud-a90zxdvg-pooler.gwc.azure.neon.tech/neondb?sslmode=require&channel_binding=require"
 
 def fast_now():
     now = datetime.now()
@@ -255,7 +254,7 @@ def inference_live2( array, start):
     return results
 
 def extract_and_transform_live(stunden):
-    jetzt = datetime.now()  # in format beispielsweise: 2025-03-06T00:00:00
+    jetzt = datetime.now(ZoneInfo("Europe/Berlin")).replace(tzinfo=None)  # in format beispielsweise: 2025-03-06T00:00:00
     jetzt = jetzt.isoformat()
 
     zeit1 =  stunden_zurueck(jetzt, stunden)
@@ -267,7 +266,7 @@ def extract_and_transform_live(stunden):
     return results
 
 def extract_and_transform_live2(stunden):
-    jetzt = datetime.now()  # in format beispielsweise: 2025-03-06T00:00:00
+    jetzt = datetime.now(ZoneInfo("Europe/Berlin")).replace(tzinfo=None)  # in format beispielsweise: 2025-03-06T00:00:00
     jetzt = jetzt.isoformat()
     zeit1 =  stunden_zurueck(jetzt, stunden)
     json_daten = osw_api_extract(zeit1, jetzt, api_url_template)
@@ -468,18 +467,9 @@ def export_to_excel_with_chart(pred, hist, lower, upper, filename="zeitreihe.xls
     print(f"✅ Excel-Datei mit Diagramm gespeichert: {filename}")
     return filename
 
-conn_str = "postgresql://neondb_owner:npg_mPqZi9CG2txF@ep-divine-mud-a90zxdvg-pooler.gwc.azure.neon.tech/neondb?sslmode=require&channel_binding=require"
-start_iso = "2025-06-01T00:00:00"
-end_iso = "2025-06-2T00:00:00"
-#results = np.array(load_time_series(conn_str, start_iso, end_iso))
-#pred, hist, lower, upper  = extract_and_stretch(results)
-#plot_time_series(pred, hist, lower, upper, save_path="time_series_plot.png")
-#excel_path = export_to_excel_with_chart(pred, hist, lower, upper, filename="time_series_data2.xlsx")
-#print(excel_path)
-
-
 
 app = FastAPI()
+
 @app.get("/download-excel")
 def download_excel2():
     conn_str = "postgresql://neondb_owner:npg_mPqZi9CG2txF@ep-divine-mud-a90zxdvg-pooler.gwc.azure.neon.tech/neondb?sslmode=require&channel_binding=require"
@@ -573,8 +563,7 @@ def live2():
     return JSONResponse(content=grouped)
 
 
-import uvicorn
 if __name__ == "__main__":
-    #uvicorn.run("db_2_excel:app", host="127.0.0.1", port=8000, reload=True)
-    port = int(os.environ.get("PORT", 8000))
-    uvicorn.run("db_2_excel:app", host="0.0.0.0", port=port, reload=False)
+    uvicorn.run("db_2_excel:app", host="127.0.0.1", port=8000, reload=True)
+    #port = int(os.environ.get("PORT", 8000))
+    #uvicorn.run("db_2_excel:app", host="0.0.0.0", port=port, reload=False)
