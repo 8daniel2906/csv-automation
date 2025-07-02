@@ -5,40 +5,54 @@ import pandas as pd
 import requests
 from datetime import datetime, time
 
-import numpy as np
 
-def convert_json_row_to_arrays(zeile_json: dict):
-    # Kopiere die Zeile, damit das Original nicht verändert wird
+def convert_json_row_to_arrays1(zeile_json: dict):
     zeile = zeile_json.copy()
-
-    # Konvertiere explizit die Felder
     zeile["historic_prediction"] = np.array(zeile["historic_prediction"])
     zeile["blaue_kurve"] = np.array(zeile["blaue_kurve"])
     zeile["lower_hist"] = np.array(zeile["lower_hist"])
     zeile["upper_hist"] = np.array(zeile["upper_hist"])
-
     return zeile
 
+def convert_json_row_to_arrays2(grouped_json: dict):
+    converted = grouped_json.copy()
+
+    converted["historic_prediction"] = [np.array(arr) for arr in grouped_json["historic_prediction"]]
+    converted["historic_vergleich"] = [np.array(arr) for arr in grouped_json["historic_vergleich"]]
+    converted["lower_hist"] = [np.array(arr) for arr in grouped_json["lower_hist"]]
+    converted["upper_hist"] = [np.array(arr) for arr in grouped_json["upper_hist"]]
+
+    return converted
 
 def get_live_data():
     response = requests.get("https://image-api-latest-3.onrender.com/get-live")
+    #response = requests.get("http://127.0.0.1:8000/get-live")
     response_json = response.json()
-    converted = convert_json_row_to_arrays(response_json["results"][0])
+    converted = convert_json_row_to_arrays1(response_json["results"][0])
+    return converted
+
+def get_live_data2():
+    response = requests.get("https://image-api-latest-3.onrender.com/get-live2")
+    #response = requests.get("http://127.0.0.1:8000/get-live2")
+    response_json = response.json()
+    converted = convert_json_row_to_arrays2(response_json)
     return converted
 
 converted = get_live_data()
 
-timestamps_array = np.load('timestamps.npy', allow_pickle=True)
+converted2 = get_live_data2()
+
+#timestamps_array = np.load('timestamps.npy', allow_pickle=True)
 
 # Konvertiere den ersten Timestamp zu einem datetime-Objekt
-first_timestamp = pd.to_datetime(timestamps_array[1])
-second_timestamp = pd.to_datetime(timestamps_array[0])
+#first_timestamp = pd.to_datetime(timestamps_array[1])
+#second_timestamp = pd.to_datetime(timestamps_array[0])
 
 
-array_blue = np.load('input.npy')
-array_red = np.load('live_prediction.npy')
-lower = np.load('lower.npy')
-upper = np.load('upper.npy')
+#array_blue = np.load('input.npy')
+#array_red = np.load('live_prediction.npy')
+#lower = np.load('lower.npy')
+#upper = np.load('upper.npy')
 lower_historic = np.load('lower_historic.npy')
 upper_historic = np.load('upper_historic.npy')
 
@@ -48,6 +62,13 @@ array_red = converted["historic_prediction"]
 array_blue = converted["blaue_kurve"]
 upper = converted["upper_hist"]
 lower = converted["lower_hist"]
+
+first_timestamp2 = converted2["zeit1"][0]
+second_timestamp2 = converted2["zeit2"][-2]
+zwölfstündige_Vorhersagen = np.array(converted2["historic_prediction"]).flatten()
+Wasserstand_der_letzten_Woche = np.array(converted2["historic_vergleich"]).flatten()
+upper_historic = np.array(converted2["upper_hist"]).flatten()
+lower_historic = np.array(converted2["lower_hist"]).flatten()
 
 # Zeitstempel für die x-Achse
 time_blue = pd.date_range(start=first_timestamp, periods=len(array_blue), freq='T')
@@ -94,11 +115,11 @@ st.markdown("---")
 
 
 # Laden der fünf neuen Arrays für den zweiten Plot
-Wasserstand_der_letzten_Woche = np.load('historic_data.npy')
-zwölfstündige_Vorhersagen = np.load('historic_predictions.npy')
-Fehler_pro_Messung = np.load('error.npy')
-array_mean = np.load('mean_error.npy') #alle werte hier sind identisch
-array_max = np.load('max_global_error.npy')#alle werte hier sind identisch
+#Wasserstand_der_letzten_Woche = np.load('historic_data.npy')
+#zwölfstündige_Vorhersagen = np.load('historic_predictions.npy')
+Fehler_pro_Messung = np.abs(Wasserstand_der_letzten_Woche - zwölfstündige_Vorhersagen)
+array_mean = np.mean(Fehler_pro_Messung) #alle werte hier sind identisch
+array_max = np.max(Fehler_pro_Messung)#alle werte hier sind identisch
 print(len(Wasserstand_der_letzten_Woche))
 print(len(lower_historic))
 # 🔸 Trefferquote berechnen
@@ -111,14 +132,14 @@ summe = np.sum(upper_historic - lower_historic)/total
 
 
 # Erzeuge Zeitstempel für Plot 2
-time_1 = pd.date_range(start=second_timestamp, periods=len(Wasserstand_der_letzten_Woche), freq='T')
+time_1 = pd.date_range(start=first_timestamp2, periods=len(Wasserstand_der_letzten_Woche), freq='T')
 
 fig2 = go.Figure()
 
 fig2.add_trace(go.Scatter(x=time_1, y=Wasserstand_der_letzten_Woche, mode='lines', name='Wasserstand der letzten Woche', line=dict(color='#66B2FF', width = 0.7)))#farbwahl ist ein helleres blau, da streamlit dunkel ist, wegen kontrast
 fig2.add_trace(go.Scatter(x=time_1, y=zwölfstündige_Vorhersagen, mode='lines', name='Vorhersage', line=dict(color='red', width = 0.5)))
 fig2.add_trace(go.Scatter(x=time_1, y=Fehler_pro_Messung, mode='lines',
-                          name=f'Vorhersagefehler <br>Ø Vorhersagefehler: {array_mean[0]:.2f}cm <br>MAX. Vorhersagefehler: {array_max[0]:.2f}cm',
+                          name=f'Vorhersagefehler <br>Ø Vorhersagefehler: {array_mean:.2f}cm <br>MAX. Vorhersagefehler: {array_max:.2f}cm',
                           line=dict(color='orange', width = 0.5)))
 
 

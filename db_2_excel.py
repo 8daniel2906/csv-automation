@@ -211,7 +211,6 @@ def inference_live(array, start):
             temp_arr = np.concatenate((temp_arr, historic_prediction_temp))
             temp_arr = temp_arr[360:]
             temp_arr = np.concatenate((array[ i * 60 + (j + 1) * 360, :12].reshape(12, ), temp_arr))
-
         historic_prediction = historic_prediction * 1000
         cluster_labels2 = assign_clusters_inference( historic_prediction, chunk, kmeans)  # chunk, kmeans global
         q_low_hist, q_up_hist = get_quantile_bounds_from_labels(cluster_labels2, time_labels_klein, interval_matrix)
@@ -221,20 +220,61 @@ def inference_live(array, start):
         zeit1 = stunden_zurueck(start, 2)
         zeile = [zeit1, zeit2, np.max(np.array(historic_vergleich)), np.max(np.array(upper_hist)), np.array(historic_prediction), np.array(blaue_kurve)*1000, np.array(lower_hist), np.array(upper_hist)]
         results.append(zeile)
-
     return results
 
+def inference_live2( array, start):
+    #temp_arr = []
+    #historic_prediction = []
+    #historic_prediction_temp = []
+    results = []
+    steps = len(array)//720 -1
+    model, kmeans, interval_matrix, chunk, cluster, time_teile, time_labels_klein = get_models()
+    for i in range(steps):
+        historic_datum = array[ i * 720, :12].reshape(12, )
+        historic_stand = array[ i * 720 : ( i * 720) + 840, 12].reshape(840, )
+        historic_vergleich = array[( i * 720) + 840 : ( i * 720) + 840 + 720, 12]*1000
+        temp_arr = np.concatenate((historic_datum, historic_stand))
+        historic_prediction = []
+        for j in range(2):
+            historic_prediction_temp = model.predict(temp_arr.reshape(1, -1), verbose=0).reshape(360, )
+            historic_prediction = np.append(historic_prediction, historic_prediction_temp)
+            temp_arr = temp_arr[12:]
+            temp_arr = np.concatenate((temp_arr, historic_prediction_temp))
+            temp_arr = temp_arr[360:]
+            temp_arr = np.concatenate((array[ i * 720 + (j + 1) * 360, :12].reshape(12, ), temp_arr))
+        historic_prediction = historic_prediction * 1000
+        cluster_labels2 = assign_clusters_inference( historic_prediction, chunk, kmeans)  # chunk, kmeans global
+        q_low_hist, q_up_hist = get_quantile_bounds_from_labels(cluster_labels2, time_labels_klein, interval_matrix)
+        lower_hist = historic_prediction - np.abs(q_low_hist)
+        upper_hist = historic_prediction + np.abs(q_up_hist)
+        zeit1 = start
+        zeit2 = stunden_danach(start, 12)
+        start = stunden_danach(start, 1)
+        zeile = [zeit1, zeit2, np.max(np.array(historic_vergleich)), np.max(np.array(upper_hist)), np.array(historic_prediction), np.array(historic_vergleich), np.array(lower_hist), np.array(upper_hist)]
+        results.append(zeile)
+    return results
 
-def extract_and_transform_live():
+def extract_and_transform_live(stunden):
     jetzt = datetime.now()  # in format beispielsweise: 2025-03-06T00:00:00
     jetzt = jetzt.isoformat()
 
-    zeit1 =  stunden_zurueck(jetzt, 12)
+    zeit1 =  stunden_zurueck(jetzt, stunden)
     json_daten = osw_api_extract(zeit1, jetzt, api_url_template)
     df = json_to_dataframe(json_daten, spalten_umbenennung={"begin": "Zeit", "v": "Wert"})
     df2 = df_cleansing(df)
     df3 = df_feature_engineering(df2)
-    results = inference_live( df3, stunden_zurueck(jetzt, 12))
+    results = inference_live( df3, stunden_zurueck(jetzt, stunden))
+    return results
+
+def extract_and_transform_live2(stunden):
+    jetzt = datetime.now()  # in format beispielsweise: 2025-03-06T00:00:00
+    jetzt = jetzt.isoformat()
+    zeit1 =  stunden_zurueck(jetzt, stunden)
+    json_daten = osw_api_extract(zeit1, jetzt, api_url_template)
+    df = json_to_dataframe(json_daten, spalten_umbenennung={"begin": "Zeit", "v": "Wert"})
+    df2 = df_cleansing(df)
+    df3 = df_feature_engineering(df2)
+    results = inference_live2( df3, zeit1)
     return results
 
 def get_latest_endzeitpunkt_iso(conn_str):
@@ -491,7 +531,7 @@ def download_excel(time_range: TimeRange):
 
 @app.get("/get-live")
 def live():
-    results = extract_and_transform_live()
+    results = extract_and_transform_live(12)
     result_json_ready = []
     for zeile in results:
         result_json_ready.append({
@@ -505,6 +545,33 @@ def live():
             "upper_hist": zeile[7].tolist(),
         })
     return JSONResponse(content={"results": result_json_ready})
+
+@app.get("/get-live2")
+def live2():
+    results = extract_and_transform_live2(120)
+    # Neue leere Listen für jede "Spalte"
+    grouped = {
+        "zeit1": [],
+        "zeit2": [],
+        "max_vergleich": [],
+        "max_upper": [],
+        "historic_prediction": [],
+        "historic_vergleich": [],
+        "lower_hist": [],
+        "upper_hist": [],
+    }
+    for zeile in results:
+        grouped["zeit1"].append(str(zeile[0]))
+        grouped["zeit2"].append(str(zeile[1]))
+        grouped["max_vergleich"].append(zeile[2])
+        grouped["max_upper"].append(zeile[3])
+        grouped["historic_prediction"].append(zeile[4].tolist())
+        grouped["historic_vergleich"].append(zeile[5].tolist())
+        grouped["lower_hist"].append(zeile[6].tolist())
+        grouped["upper_hist"].append(zeile[7].tolist())
+
+    return JSONResponse(content=grouped)
+
 
 import uvicorn
 if __name__ == "__main__":
