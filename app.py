@@ -21,6 +21,7 @@ def convert_json_row_to_arrays2(grouped_json: dict):
     converted["historic_vergleich"] = [np.array(arr) for arr in grouped_json["historic_vergleich"]]
     converted["lower_hist"] = [np.array(arr) for arr in grouped_json["lower_hist"]]
     converted["upper_hist"] = [np.array(arr) for arr in grouped_json["upper_hist"]]
+    converted["statistics"] = grouped_json["statistics"]
 
     return converted
 
@@ -32,8 +33,8 @@ def get_live_data():
     return converted
 
 def get_live_data2():
-    response = requests.get("https://image-api-latest-3.onrender.com/get-live2")
-    #response = requests.get("http://127.0.0.1:8000/get-live2")
+    #response = requests.get("https://image-api-latest-3.onrender.com/get-live2")
+    response = requests.get("http://127.0.0.1:8000/get-live2")
     response_json = response.json()
     converted = convert_json_row_to_arrays2(response_json)
     return converted
@@ -48,7 +49,7 @@ converted2 = get_live_data2()
 #first_timestamp = pd.to_datetime(timestamps_array[1])
 #second_timestamp = pd.to_datetime(timestamps_array[0])
 
-
+print(converted2["statistics"])
 #array_blue = np.load('input.npy')
 #array_red = np.load('live_prediction.npy')
 #lower = np.load('lower.npy')

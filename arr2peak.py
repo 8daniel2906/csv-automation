@@ -17,10 +17,6 @@ def arr2peak(prediction, historic):
         hochwasser_real = int(np.max(hist))
         pred_peak.append(hochwasser_pred)
         hist_peak.append(hochwasser_real)
-        #print('pred ', i, ': ', hochwasser_pred)
-        #print('hist ', i, ': ', hochwasser_real)
-    #p_trunc = prediction[:steps] #wir wollen nur wolle abschnitte von 720 werten, deshalb schneiden wir den rest am ende raus von den vorhersagen, die nicht 720 voll haben
-    #h_trunc = historic[:steps]  #same
     return p_trunc, h_trunc, pred_peak, hist_peak, steps
 
 
@@ -50,6 +46,7 @@ def warnung_generator(upper_peak, hist_peak):
     TN = np.sum(mask12 & mask22)
 
     print(f"Warn.und HW.: {TP}, Entwarn. aber HW: {FN}, Warn. aber K.HW: {FP}, Entwarn. und K. HW: {TN} ")
+    return TP, FN, FP, TN
 
 
 

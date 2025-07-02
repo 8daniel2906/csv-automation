@@ -28,6 +28,26 @@ from zoneinfo import ZoneInfo
 api_url_template = "https://api.opensensorweb.de/v1/organizations/open/networks/BAFG/devices/5952025/sensors/W/measurements/raw?start={start}%2B02:00&end={end}%2B02:00&interpolator=LINEAR"
 conn_str = "postgresql://neondb_owner:npg_mPqZi9CG2txF@ep-divine-mud-a90zxdvg-pooler.gwc.azure.neon.tech/neondb?sslmode=require&channel_binding=require"
 
+def warnung_generator(upper_peak, hist_peak):
+    schwelle = 750 #das ist PI-model abhängig und kmeans abhängig
+    hist_peak = np.array(hist_peak)
+    upper_peak = np.array(upper_peak)
+    mask11 = hist_peak >= schwelle      # Ground Truth: Überschwemmung
+    mask12 = hist_peak < schwelle       # Ground Truth: keine Überschwemmung
+
+    mask21 = upper_peak >= schwelle     # Prediction: Warnung
+    mask22 = upper_peak < schwelle      # Prediction: keine Warnung
+
+        # TP, FN, FP, TN
+    TP = np.sum(mask11 & mask21)
+    FN = np.sum(mask11 & mask22)
+    FP = np.sum(mask12 & mask21)
+    TN = np.sum(mask12 & mask22)
+
+    #print(f"Warn.und HW.: {TP}, Entwarn. aber HW: {FN}, Warn. aber K.HW: {FP}, Entwarn. und K. HW: {TN} ")
+    return int(TP), int(FN), int(FP), int(TN)
+
+
 def fast_now():
     now = datetime.now()
     fast_now = now.replace(minute=0, second=0, microsecond=0) - timedelta(hours=1)
@@ -549,6 +569,7 @@ def live2():
         "historic_vergleich": [],
         "lower_hist": [],
         "upper_hist": [],
+        "statistics": []
     }
     for zeile in results:
         grouped["zeit1"].append(str(zeile[0]))
@@ -560,10 +581,14 @@ def live2():
         grouped["lower_hist"].append(zeile[6].tolist())
         grouped["upper_hist"].append(zeile[7].tolist())
 
+    TP, FN, FP, TN = warnung_generator(np.array(grouped["max_upper"]).flatten(), np.array(grouped["max_vergleich"]).flatten())
+    grouped["statistics"] = [TP, FN, FP, TN]
+
     return JSONResponse(content=grouped)
 
 
+
 if __name__ == "__main__":
-    #uvicorn.run("db_2_excel:app", host="127.0.0.1", port=8000, reload=True)
-    port = int(os.environ.get("PORT", 8000))
-    uvicorn.run("db_2_excel:app", host="0.0.0.0", port=port, reload=False)
+    uvicorn.run("db_2_excel:app", host="127.0.0.1", port=8000, reload=True)
+    #port = int(os.environ.get("PORT", 8000))
+    #uvicorn.run("db_2_excel:app", host="0.0.0.0", port=port, reload=False)
