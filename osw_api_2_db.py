@@ -11,6 +11,31 @@ import sklearn
 import matplotlib.pyplot as plt
 import psycopg2 as psy
 from api import api_url_template
+import io
+from fastapi import FastAPI
+from fastapi.responses import FileResponse
+from fastapi.responses import StreamingResponse
+import io
+import uvicorn
+import os
+from pydantic import BaseModel
+from openpyxl import load_workbook
+from openpyxl.chart import LineChart, Reference
+from openpyxl.utils.dataframe import dataframe_to_rows
+from fastapi.responses import JSONResponse
+import numpy as np
+import pandas as pd
+import requests
+import json
+import csv
+from datetime import datetime, timedelta
+import tensorflow as tf
+from tensorflow.keras.losses import MeanSquaredError
+import joblib
+import sklearn
+import matplotlib.pyplot as plt
+import psycopg2 as psy
+from zoneinfo import ZoneInfo
 
 conn_str = "postgresql://neondb_owner:npg_mPqZi9CG2txF@ep-divine-mud-a90zxdvg-pooler.gwc.azure.neon.tech/neondb?sslmode=require&channel_binding=require"
 jetzt = datetime.now() # in format beispielsweise: 2025-03-06T00:00:00
@@ -294,7 +319,7 @@ def load_in_db(conn_str, results):
             conn.commit()
 
 
-import io
+
 
 def load_in_db2(conn_str, results):
     with psy.connect(conn_str) as conn:
