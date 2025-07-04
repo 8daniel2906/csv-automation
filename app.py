@@ -33,8 +33,8 @@ def get_live_data():
     return converted
 
 def get_live_data2():
-    #response = requests.get("https://image-api-latest-3.onrender.com/get-live2")
-    response = requests.get("http://127.0.0.1:8000/get-live2")
+    response = requests.get("https://image-api-latest-3.onrender.com/get-live2")
+    #response = requests.get("http://127.0.0.1:8000/get-live2")
     response_json = response.json()
     converted = convert_json_row_to_arrays2(response_json)
     return converted
