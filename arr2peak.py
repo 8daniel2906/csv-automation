@@ -171,7 +171,7 @@ def df_feature_engineering(df):
 def get_models():
     model = tf.keras.models.load_model("fnn.h5",custom_objects={"mse": MeanSquaredError()})
     ####
-    model_bundle = joblib.load('kmeans_10cl_10timebin_180chunk_90%e_80%PI_750schwelle.pkl')
+    model_bundle = joblib.load('models/kmeans_10cl_10timebin_180chunk_90%e_80%PI_750schwelle.pkl')
     kmeans = model_bundle['kmeans']
     interval_matrix = model_bundle['interval_matrix']
     chunk = 180
@@ -519,7 +519,7 @@ def df_feature_engineering(df):
 def get_models():
     model = tf.keras.models.load_model("fnn.h5",custom_objects={"mse": MeanSquaredError()})
     ####
-    model_bundle = joblib.load('kmeans_10cl_10timebin_180chunk_90%e_80%PI_750schwelle.pkl')
+    model_bundle = joblib.load('models/kmeans_10cl_10timebin_180chunk_90%e_80%PI_750schwelle.pkl')
     kmeans = model_bundle['kmeans']
     interval_matrix = model_bundle['interval_matrix']
     chunk = 180
