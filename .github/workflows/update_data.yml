@@ -41,7 +41,7 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git add app.py osw_api_2_db.py db_2_excel.py Dockerfile.api Dockerfile.cron fnn.5 kmeans_10cl_10timebin_180chunk_90%e_80%PI_750schwelle.pkl README.md
+          git add app.py osw_api_2_db.py db_2_excel.py Dockerfile.api Dockerfile.cron fnn.h5 kmeans_10cl_10timebin_180chunk_90%e_80%PI_750schwelle.pkl README.md
           git commit -m " Automatische Aktualisierung der Sensordaten" || echo "Keine Änderungen zum Commit"
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/8daniel2906/csv-automation.git main
 
