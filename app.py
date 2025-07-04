@@ -50,9 +50,6 @@ converted = get_live_data()
 converted2 = get_live_data2()
 
 
-lower_historic = np.load('lower_historic.npy')
-upper_historic = np.load('upper_historic.npy')
-
 first_timestamp = converted["zeit1"]
 second_timestamp = converted["zeit2"]
 array_red = converted["historic_prediction"]
@@ -74,7 +71,6 @@ schwelle_plot = np.zeros(len(Wasserstand_der_letzten_Woche)) + hochwasser_schwel
 # Zeitstempel für die x-Achse
 time_blue = pd.date_range(start=first_timestamp, periods=len(array_blue), freq='T')
 time_red = pd.date_range(start=time_blue[-1] + pd.Timedelta(minutes=1), periods=len(array_red), freq='T')
-
 st.markdown(vorhersage_live_text(upper), unsafe_allow_html=True)
 # Erster Plot: Zwei Arrays hintereinander
 fig1 = go.Figure()
@@ -115,7 +111,6 @@ st.plotly_chart(fig1)
 
 # Eine Trennlinie für bessere Übersicht
 st.markdown("---")
-
 
 Fehler_pro_Messung = np.abs(Wasserstand_der_letzten_Woche - zwölfstündige_Vorhersagen)
 array_mean = np.mean(Fehler_pro_Messung) #alle werte hier sind identisch
