@@ -39,21 +39,17 @@ def get_live_data2():
     converted = convert_json_row_to_arrays2(response_json)
     return converted
 
-converted = get_live_data()
+def vorhersage_live_text(upper):
+    vorhersage_text = ["<span style='color:red'>Hochwasserwarnung für die nächsten 12 Stunden!</span>",
+                       "<span style='color:green'>Entwarnung für Hochwasser für die nächsten 12 Stunden!</span>"]
+    return vorhersage_text[0] if np.max(upper) > hochwasser_schwelle else vorhersage_text[1]
 
+
+
+converted = get_live_data()
 converted2 = get_live_data2()
 
-#timestamps_array = np.load('timestamps.npy', allow_pickle=True)
 
-# Konvertiere den ersten Timestamp zu einem datetime-Objekt
-#first_timestamp = pd.to_datetime(timestamps_array[1])
-#second_timestamp = pd.to_datetime(timestamps_array[0])
-
-print(converted2["statistics"])
-#array_blue = np.load('input.npy')
-#array_red = np.load('live_prediction.npy')
-#lower = np.load('lower.npy')
-#upper = np.load('upper.npy')
 lower_historic = np.load('lower_historic.npy')
 upper_historic = np.load('upper_historic.npy')
 
@@ -63,6 +59,9 @@ array_red = converted["historic_prediction"]
 array_blue = converted["blaue_kurve"]
 upper = converted["upper_hist"]
 lower = converted["lower_hist"]
+statistics = np.array(converted2["statistics"])
+
+
 
 first_timestamp2 = converted2["zeit1"][0]
 second_timestamp2 = converted2["zeit2"][-2]
@@ -70,15 +69,19 @@ zwölfstündige_Vorhersagen = np.array(converted2["historic_prediction"]).flatte
 Wasserstand_der_letzten_Woche = np.array(converted2["historic_vergleich"]).flatten()
 upper_historic = np.array(converted2["upper_hist"]).flatten()
 lower_historic = np.array(converted2["lower_hist"]).flatten()
-
+hochwasser_schwelle = 750
+schwelle_plot = np.zeros(len(Wasserstand_der_letzten_Woche)) + hochwasser_schwelle
 # Zeitstempel für die x-Achse
 time_blue = pd.date_range(start=first_timestamp, periods=len(array_blue), freq='T')
 time_red = pd.date_range(start=time_blue[-1] + pd.Timedelta(minutes=1), periods=len(array_red), freq='T')
+
+st.markdown(vorhersage_live_text(upper), unsafe_allow_html=True)
 # Erster Plot: Zwei Arrays hintereinander
 fig1 = go.Figure()
 
 fig1.add_trace(go.Scatter(x=time_blue, y=array_blue, mode='lines', name='Wasserstand der letzten 14 Stunden', line=dict(color='blue')))
 fig1.add_trace(go.Scatter(x=time_red, y=array_red, mode='lines', name='Vorhersage der nächsten 12 Stunden', line=dict(color='red')))
+fig1.add_trace(go.Scatter(x=np.concatenate((time_blue, time_red)), y=schwelle_plot, mode='lines', name="Hochwasserschwelle", line=dict(color='purple', width = 0.7)))
 # Obere Grenze
 fig1.add_trace(go.Scatter(
     x=time_red,
@@ -114,15 +117,10 @@ st.plotly_chart(fig1)
 st.markdown("---")
 
 
-
-# Laden der fünf neuen Arrays für den zweiten Plot
-#Wasserstand_der_letzten_Woche = np.load('historic_data.npy')
-#zwölfstündige_Vorhersagen = np.load('historic_predictions.npy')
 Fehler_pro_Messung = np.abs(Wasserstand_der_letzten_Woche - zwölfstündige_Vorhersagen)
 array_mean = np.mean(Fehler_pro_Messung) #alle werte hier sind identisch
 array_max = np.max(Fehler_pro_Messung)#alle werte hier sind identisch
-print(len(Wasserstand_der_letzten_Woche))
-print(len(lower_historic))
+
 # 🔸 Trefferquote berechnen
 inside = (Wasserstand_der_letzten_Woche >= lower_historic) & (Wasserstand_der_letzten_Woche <= upper_historic)
 count_inside = np.sum(inside)
@@ -131,6 +129,16 @@ hit_rate = count_inside / total
 summe = np.sum(upper_historic - lower_historic)/total
 
 
+
+
+st.markdown(f"""
+**Ergebnisse der letzen Woche:**
+
+- ✅ Warnung und Hochwasser  : **{statistics[0]}**
+- ❌ Entwarnung, aber Hochwasser : **{statistics[1]}**
+- ❌ Warnung, aber kein Hochwasser : **{statistics[2]}**
+- ✅ Entwarnung und kein Hochwasser : **{statistics[3]}**
+""")
 
 # Erzeuge Zeitstempel für Plot 2
 time_1 = pd.date_range(start=first_timestamp2, periods=len(Wasserstand_der_letzten_Woche), freq='T')
@@ -142,6 +150,7 @@ fig2.add_trace(go.Scatter(x=time_1, y=zwölfstündige_Vorhersagen, mode='lines',
 fig2.add_trace(go.Scatter(x=time_1, y=Fehler_pro_Messung, mode='lines',
                           name=f'Vorhersagefehler <br>Ø Vorhersagefehler: {array_mean:.2f}cm <br>MAX. Vorhersagefehler: {array_max:.2f}cm',
                           line=dict(color='orange', width = 0.5)))
+fig2.add_trace(go.Scatter(x=time_1, y=schwelle_plot, mode='lines', name='Hochwasser_schwelle', line=dict(color='purple', width = 0.5)))
 
 
 # Zuerst die untere Linie zeichnen (kein Fill)
