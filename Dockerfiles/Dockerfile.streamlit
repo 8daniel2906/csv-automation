@@ -8,7 +8,7 @@ WORKDIR /app
 COPY requirements_streamlit.txt ./
 
 # Abhängigkeiten installieren
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements_streamlit.txt
 
 # Restliche Dateien kopieren
 COPY . .
