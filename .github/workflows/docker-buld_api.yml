@@ -20,7 +20,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -f Dockerfile.api -t ghcr.io/${{ github.repository_owner }}/image_api:latest .
+          docker build -f Dockerfiles/Dockerfile.api -t ghcr.io/${{ github.repository_owner }}/image_api:latest .
 
       - name: Push Docker image
         run: docker push ghcr.io/${{ github.repository_owner }}/image_api:latest

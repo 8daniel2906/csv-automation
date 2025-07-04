@@ -1,4 +1,4 @@
-name: Build and Push to GHCR API Streamlit
+name: Build and Push to GHCR Streamlit
 
 on:
   workflow_dispatch:
@@ -20,7 +20,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -f Dockerfile.streamlit -t ghcr.io/${{ github.repository_owner }}/image_streamlit:latest .
+          docker build -f Dockerfiles/Dockerfile.streamlit -t ghcr.io/${{ github.repository_owner }}/image_streamlit:latest .
 
       - name: Push Docker image
         run: docker push ghcr.io/${{ github.repository_owner }}/image_streamlit:latest
