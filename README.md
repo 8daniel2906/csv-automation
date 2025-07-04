@@ -5,7 +5,7 @@ Dieses Projekt nutzt Machine Learning zur Vorhersage von Wasserständen basieren
 
 
 ## 📈 Zur Vorhersage: 
-Eine Live-Demo der Anwendung ist hier verfügbar: [Streamlit Link](https://csv-automation-n4hzumwzdcoefrw3qrq9rs.streamlit.app/)
+Eine Live-Demo der Anwendung ist hier verfügbar: [Streamlit Link](https://csv-automation-jmavdhu2dqd8l9nmezgt9w.streamlit.app/)
 
 ## Technologien & Tools
 - **Programmiersprache:** Python
