@@ -1,6 +1,7 @@
 name: Automatische Datenaktualisierung
 
 on:
+  push:
   #schedule:
     #- cron: "0 */1 * * *"
   workflow_dispatch:  # Erlaubt manuelles Starten über GitHub UI

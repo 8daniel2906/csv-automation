@@ -127,11 +127,14 @@ def main():
 
     # Zeitraum-Auswahl & Download
     st.title("Zeitraum-Auswahl")
+    col1, col2 = st.columns([1, 5])  # Erste Spalte schmaler (1), zweite breiter (5)
 
-    start_date = st.date_input("Startdatum", value=datetime.today())
-    start_hour = st.number_input("Startstunde (0-23)", min_value=0, max_value=23, value=0)
-    end_date = st.date_input("Enddatum", value=datetime.today())
-    end_hour = st.number_input("Endstunde (0-23)", min_value=0, max_value=23, value=23)
+    with col1:
+
+        start_date = st.date_input("Startdatum", value=datetime.today())
+        start_hour = st.number_input("Startstunde (0-23)", min_value=0, max_value=23, value=0)
+        end_date = st.date_input("Enddatum", value=datetime.today())
+        end_hour = start_hour
 
     start_datetime = datetime.combine(start_date, time(start_hour, 0))
     end_datetime = datetime.combine(end_date, time(end_hour, 0))
@@ -141,6 +144,7 @@ def main():
 
     if st.button("Excel-File downloaden für den Zeitraum"):
         json_data = {"start_iso": start_datetime.isoformat(), "end_iso": end_datetime.isoformat()}
+        #response = requests.post("http://127.0.0.1:8000/download-excel", json=json_data)
         response = requests.post("https://image-api-latest-3.onrender.com/download-excel", json=json_data)
         if response.status_code == 200:
             st.download_button(

@@ -3,8 +3,6 @@ import pandas as pd
 import psycopg2 as psy
 import requests
 import tensorflow as tf
-
-
 from datetime import datetime, timedelta, time
 from tensorflow.keras.losses import MeanSquaredError
 from zoneinfo import ZoneInfo

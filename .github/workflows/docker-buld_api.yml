@@ -1,6 +1,7 @@
 name: Build and Push to GHCR API
 
 on:
+  push:
   workflow_dispatch:
 
 jobs:
