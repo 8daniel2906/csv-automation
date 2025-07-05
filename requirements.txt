@@ -8,3 +8,4 @@ datetime
 joblib
 numpy==1.23.5
 setuptools
+psycopg2
