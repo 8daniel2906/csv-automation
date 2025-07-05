@@ -4,15 +4,19 @@ import psycopg2 as psy
 import requests
 import tensorflow as tf
 
-from api import api_url_template
+
 from datetime import datetime, timedelta, time
 from tensorflow.keras.losses import MeanSquaredError
 from zoneinfo import ZoneInfo
 import joblib
 
-
+def now_berlin_time():
+    jetzt = datetime.now(ZoneInfo("Europe/Berlin")).replace(
+        tzinfo=None)  # in format beispielsweise: 2025-03-06T00:00:00
+    return jetzt.isoformat()
 def fast_now():
-    now = datetime.now()
+    now = datetime.now(ZoneInfo("Europe/Berlin")).replace(
+        tzinfo=None)
     fast_now = now.replace(minute=0, second=0, microsecond=0) - timedelta(hours=1)
     return fast_now.isoformat()
 def date_2_iso(jahr: int, monat: int, tag: int, stunde: int) -> str:
@@ -175,15 +179,20 @@ def get_latest_endzeitpunkt_iso(conn_str):
         print(f"Fehler: {e}")
         return None
 
+def transform(json_daten):
+    df = json_to_dataframe(json_daten, spalten_umbenennung={"begin": "Zeit", "v": "Wert"})
+    df2 = df_cleansing(df)
+    df3 = df_feature_engineering(df2)
+    return df3
 
-
-def inference(steps, array, start):
+def inference( array, start):
     #temp_arr = []
     #historic_prediction = []
     #historic_prediction_temp = []
     results = []
     model, kmeans, interval_matrix, chunk, cluster, time_teile, time_labels_klein = get_models()
-
+    steps = (len(array) / 60) - 25
+    print(steps)
 
     for i in range(steps):
         historic_datum = array[ i * 60, :12].reshape(12, )
@@ -273,28 +282,11 @@ def inference_live2( array, start):
         results.append(zeile)
     return results
 
+
 def extract_and_transform_live(stunden, inference_func):
-    jetzt = datetime.now(ZoneInfo("Europe/Berlin")).replace(tzinfo=None)  # in format beispielsweise: 2025-03-06T00:00:00
-    jetzt = jetzt.isoformat()
-
-    zeit1 =  stunden_zurueck(jetzt, stunden)
-    json_daten = osw_api_extract(zeit1, jetzt, api_url_template)
-    df = json_to_dataframe(json_daten, spalten_umbenennung={"begin": "Zeit", "v": "Wert"})
-    df2 = df_cleansing(df)
-    df3 = df_feature_engineering(df2)
-    results = inference_func( df3, zeit1)
-    return results
-def extract_and_tranform(zeitpunkt1, zeitpunkt2):
-
-    db_ende =  zeitpunkt1
-    db_start = stunden_zurueck(db_ende, 12)
-    json_daten = osw_api_extract(stunden_zurueck(db_ende, 25), zeitpunkt2, api_url_template)
-    df = json_to_dataframe(json_daten, spalten_umbenennung={"begin": "Zeit", "v": "Wert"})
-    df2 = df_cleansing(df)
-    df3 = df_feature_engineering(df2)
-    steps = int(stunden_diff(db_ende, zeitpunkt2))
-    results = inference(steps, df3, stunden_danach(db_start, 1))
-
+    json_daten = osw_api_extract(stunden_zurueck(now_berlin_time(), stunden), now_berlin_time(), api_url_template)
+    df3 = transform(json_daten)
+    results = inference_func( df3, stunden_zurueck(now_berlin_time(), stunden))
     return results
 
 

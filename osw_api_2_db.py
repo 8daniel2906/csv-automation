@@ -4,15 +4,16 @@ from utils import *
 
 jetzt = datetime.now() # in format beispielsweise: 2025-03-06T00:00:00
 
-def inference(steps, array, start):
+def inference( array, start):
     #temp_arr = []
     #historic_prediction = []
     #historic_prediction_temp = []
     results = []
     model, kmeans, interval_matrix, chunk, cluster, time_teile, time_labels_klein = get_models()
 
+    steps = len(array)/60 -25
 
-    for i in range(steps):
+    for i in range(int(steps)):
         historic_datum = array[ i * 60, :12].reshape(12, )
         historic_stand = array[ i * 60 : ( i * 60) + 840, 12].reshape(840, )
         historic_vergleich = array[( i * 60) + 840 : ( i * 60) + 840 + 720, 12]*1000
@@ -38,16 +39,6 @@ def inference(steps, array, start):
         results.append(zeile)
 
     return results
-def extract_and_tranform(zeitpunkt1, zeitpunkt2, api_template ):
-
-    db_ende =  zeitpunkt1
-    db_start = stunden_zurueck(db_ende, 12)
-    json_daten = osw_api_extract(stunden_zurueck(db_ende, 25), zeitpunkt2, api_url_template)
-    df = json_to_dataframe(json_daten, spalten_umbenennung={"begin": "Zeit", "v": "Wert"})
-    df2 = df_cleansing(df)
-    df3 = df_feature_engineering(df2)
-    steps = int(stunden_diff(db_ende, zeitpunkt2))
-    results = inference(steps, df3, stunden_danach(db_start, 1))
 
     return results
 def load_in_db2(conn_str, results):
@@ -95,5 +86,7 @@ def load_in_db2(conn_str, results):
 
 if __name__ == "__main__":
     iso_date = get_latest_endzeitpunkt_iso(conn_str)
-    results = extract_and_tranform(iso_date, fast_now(), api_url_template)
+    json_daten = osw_api_extract(stunden_zurueck(iso_date, 11), fast_now(), api_url_template)
+    df3 = transform(json_daten)
+    results = inference(df3, stunden_zurueck(iso_date, 11))
     load_in_db2(conn_str, results)
