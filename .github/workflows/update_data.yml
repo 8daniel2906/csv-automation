@@ -20,7 +20,7 @@ jobs:
 
       - name: Abhängigkeiten installieren
         run: |
-          pip install requests pyyaml streamlit pandas matplotlib plotly tensorflow datetime scipy joblib scikit-learn==1.2.2 numpy==1.23.5 setuptools psycopg2
+          pip install requests pyyaml streamlit pandas matplotlib plotly tensorflow datetime scipy joblib scikit-learn==1.2.2 numpy==1.23.5 setuptools psycopg2 psycopg2-binary
 
       - name: streamlit updaten
         run: python app.py

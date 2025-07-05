@@ -2,8 +2,6 @@ import io
 from config import api_url_template, conn_str
 from utils import *
 
-jetzt = datetime.now() # in format beispielsweise: 2025-03-06T00:00:00
-
 def inference( array, start):
     #temp_arr = []
     #historic_prediction = []
@@ -82,7 +80,6 @@ def load_in_db2(conn_str, results):
             conn.commit()
 
             print("✅ Alle Daten mit COPY (psycopg2) eingespielt.")
-
 
 if __name__ == "__main__":
     iso_date = get_latest_endzeitpunkt_iso(conn_str)

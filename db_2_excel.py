@@ -4,14 +4,9 @@ import io
 import uvicorn
 import os
 from pydantic import BaseModel
-from openpyxl import load_workbook
-from openpyxl.chart import LineChart, Reference
 from fastapi.responses import JSONResponse
-import matplotlib.pyplot as plt
 from config import api_url_template, conn_str
 from utils import *
-###############################################################################
-conn_str = "postgresql://neondb_owner:npg_mPqZi9CG2txF@ep-divine-mud-a90zxdvg-pooler.gwc.azure.neon.tech/neondb?sslmode=require&channel_binding=require"
 
 def warnung_generator(upper_peak, hist_peak):
     schwelle = 750 #das ist PI-model abhängig und kmeans abhängig
@@ -92,13 +87,11 @@ def inference_live2( array, start):
         zeile = [zeit1, zeit2, np.max(np.array(historic_vergleich)), np.max(np.array(upper_hist)), np.array(historic_prediction), np.array(historic_vergleich), np.array(lower_hist), np.array(upper_hist)]
         results.append(zeile)
     return results
-
 def extract_and_transform_live(stunden, inference_func):
     json_daten = osw_api_extract(stunden_zurueck(now_berlin_time(), stunden), now_berlin_time(), api_url_template)
     df3 = transform(json_daten)
     results = inference_func( df3, stunden_zurueck(now_berlin_time(), stunden))
     return results
-#########################################################################
 def load_time_series(conn_str, startzeit_iso, endzeit_iso):
     with psy.connect(conn_str) as conn:
         with conn.cursor() as cur:
@@ -164,7 +157,6 @@ def stretch_array(arr):
     new_indices = np.linspace(0, n - 1, (n - 1) * 5 + 1)
     new_arr = np.interp(new_indices, old_indices, arr)
     return new_arr.tolist()
-
 def extract_and_stretch(results):
     """Extrahiert Spalten aus einem Block und interpoliert sie."""
     pred_ = []
@@ -263,8 +255,6 @@ def live2():
     grouped["statistics"] = [TP, FN, FP, TN]
 
     return JSONResponse(content=grouped)
-
-
 
 if __name__ == "__main__":
     #uvicorn.run("db_2_excel:app", host="127.0.0.1", port=8000, reload=True)

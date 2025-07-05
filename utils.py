@@ -176,7 +176,6 @@ def get_latest_endzeitpunkt_iso(conn_str):
     except Exception as e:
         print(f"Fehler: {e}")
         return None
-
 def get_earliest_startzeitpunkt_iso(conn_str):
     query = "SELECT MIN(startzeit) FROM zeitreihe_metadata;"
     try:
@@ -192,13 +191,11 @@ def get_earliest_startzeitpunkt_iso(conn_str):
     except Exception as e:
         print(f"Fehler: {e}")
         return None
-
 def transform(json_daten):
     df = json_to_dataframe(json_daten, spalten_umbenennung={"begin": "Zeit", "v": "Wert"})
     df2 = df_cleansing(df)
     df3 = df_feature_engineering(df2)
     return df3
-
 def inference( array, start):
     #temp_arr = []
     #historic_prediction = []
@@ -295,8 +292,6 @@ def inference_live2( array, start):
         zeile = [zeit1, zeit2, np.max(np.array(historic_vergleich)), np.max(np.array(upper_hist)), np.array(historic_prediction), np.array(historic_vergleich), np.array(lower_hist), np.array(upper_hist)]
         results.append(zeile)
     return results
-
-
 def extract_and_transform_live(stunden, inference_func):
     json_daten = osw_api_extract(stunden_zurueck(now_berlin_time(), stunden), now_berlin_time(), api_url_template)
     df3 = transform(json_daten)
