@@ -4,8 +4,9 @@ import plotly.graph_objects as go
 import pandas as pd
 import requests
 from datetime import datetime, time
-from utils import get_latest_endzeitpunkt_iso, get_earliest_startzeitpunkt_iso
 import psycopg2 as psy
+from utils import get_latest_endzeitpunkt_iso, get_earliest_startzeitpunkt_iso
+
 # ------------------ Datenkonvertierung ------------------
 def convert_json_row_to_arrays1(zeile_json: dict):
     zeile = zeile_json.copy()
