@@ -3,6 +3,7 @@ requests
 pyyaml
 pandas
 matplotlib
+tensorflow
 plotly
 datetime
 joblib
