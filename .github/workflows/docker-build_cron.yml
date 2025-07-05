@@ -1,7 +1,7 @@
 name: Build and Push to GHCR CRONJOB
 
 on:
-  push:
+  #push:
   workflow_dispatch:
 
 jobs:

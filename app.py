@@ -4,6 +4,7 @@ import plotly.graph_objects as go
 import pandas as pd
 import requests
 from datetime import datetime, time
+from utils import get_latest_endzeitpunkt_iso, get_earliest_startzeitpunkt_iso
 
 # ------------------ Datenkonvertierung ------------------
 def convert_json_row_to_arrays1(zeile_json: dict):
@@ -29,6 +30,7 @@ def get_live_data2():
     response = requests.get("https://image-api-latest-3.onrender.com/get-live2")
     response_json = response.json()
     return convert_json_row_to_arrays2(response_json)
+
 
 # ------------------ Berechnungen ------------------
 def calculate_prediction_text(upper, threshold):

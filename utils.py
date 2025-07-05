@@ -177,6 +177,22 @@ def get_latest_endzeitpunkt_iso(conn_str):
         print(f"Fehler: {e}")
         return None
 
+def get_earliest_startzeitpunkt_iso(conn_str):
+    query = "SELECT MIN(startzeit) FROM zeitreihe_metadata;"
+    try:
+        with psy.connect(conn_str) as conn:
+            with conn.cursor() as cur:
+                cur.execute(query)
+                result = cur.fetchone()[0]
+                if result:
+                    # In ISO-Format umwandeln: 2025-03-06T00:00:00
+                    return result.strftime("%Y-%m-%dT%H:%M:%S")
+                else:
+                    return None  # Falls Tabelle leer
+    except Exception as e:
+        print(f"Fehler: {e}")
+        return None
+
 def transform(json_daten):
     df = json_to_dataframe(json_daten, spalten_umbenennung={"begin": "Zeit", "v": "Wert"})
     df2 = df_cleansing(df)
