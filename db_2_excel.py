@@ -180,7 +180,7 @@ def extract_and_stretch(results):
         upper_.append(upper)
         max_hist_.append(max_hist)
         max_upper_.append(max_upper)
-    return np.array(pred_).flatten(), np.array(hist_).flatten(), np.array(lower_).flatten(), np.array(upper_).flatten(),np.array(max_hist_).flatten(),np.array(max_upper_).flatten(),start, ende
+    return np.array(pred_).flatten(), np.array(hist_).flatten(), np.array(lower_).flatten(), np.array(upper_).flatten(),np.array(max_hist_).flatten(),np.array(max_upper_).flatten(), start.isoformat(), ende.isoformat()
 #######################################################################################################################
 app = FastAPI()
 class TimeRange(BaseModel):
