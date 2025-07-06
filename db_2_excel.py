@@ -172,14 +172,14 @@ def extract_and_stretch(results):
         upper = stretch_array([row[4] for row in results[i]['data']])
         max_hist  = results[i]["max_value_historic"]
         max_upper = results[i]["max_value_upperpi_80_perc"]
-        start = results[0]["startzeit"]
-        ende = results[-1]["endzeit"]
         pred_.append(pred)
         hist_.append(hist)
         lower_.append(lower)
         upper_.append(upper)
         max_hist_.append(max_hist)
         max_upper_.append(max_upper)
+    start = results[0]["startzeit"]
+    ende = results[-1]["endzeit"]
     return np.array(pred_).flatten(), np.array(hist_).flatten(), np.array(lower_).flatten(), np.array(upper_).flatten(),np.array(max_hist_).flatten(),np.array(max_upper_).flatten(), start.isoformat(), ende.isoformat()
 #######################################################################################################################
 app = FastAPI()
