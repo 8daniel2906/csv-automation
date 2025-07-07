@@ -3,7 +3,7 @@ import numpy as np
 import plotly.graph_objects as go
 import pandas as pd
 import requests
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 import psycopg2 as psy
 from utils import get_latest_endzeitpunkt_iso, get_earliest_startzeitpunkt_iso
 
@@ -31,7 +31,13 @@ def get_live_data2():
     response = requests.get("https://image-api-latest-3.onrender.com/get-live2")
     response_json = response.json()
     return convert_json_row_to_arrays2(response_json)
+@st.cache_data(ttl=300)
+def get_live_data_cached():
+    return get_live_data()
 
+@st.cache_data(ttl=300)
+def get_live_data2_cached():
+    return get_live_data2()
 
 # ------------------ Berechnungen ------------------
 def calculate_prediction_text(upper, threshold):
@@ -89,8 +95,8 @@ def main():
     hochwasser_schwelle = 750
 
     # Daten laden
-    converted = get_live_data()
-    converted2 = get_live_data2()
+    converted = get_live_data_cached()
+    converted2 = get_live_data2_cached()
 
     # Live-Daten
     time_blue = pd.date_range(start=converted["zeit1"], periods=len(converted["blaue_kurve"]), freq='T')
@@ -129,14 +135,21 @@ def main():
     st.markdown("---")
 
     # Zeitraum-Auswahl & Download
+    conn_str = "postgresql://neondb_owner:npg_mPqZi9CG2txF@ep-divine-mud-a90zxdvg-pooler.gwc.azure.neon.tech/neondb?sslmode=require&channel_binding=require"
+    datum1 = get_earliest_startzeitpunkt_iso(conn_str)
+    datum2 = get_latest_endzeitpunkt_iso(conn_str)
+    # Umwandeln in date-Objekte
+    datum1_date = datetime.fromisoformat(datum1).date()
+    datum2_date = datetime.fromisoformat(datum2).date()
+    yesterday = datetime.today().date() - timedelta(days=1)
+
     st.title("Zeitraum-Auswahl")
-    col1, col2 = st.columns([1, 5])  # Erste Spalte schmaler (1), zweite breiter (5)
+    col1, col2 = st.columns([1, 5])
 
     with col1:
-
-        start_date = st.date_input("Startdatum", value=datetime.today())
+        start_date = st.date_input("Startdatum",value=yesterday,min_value=datum1_date,max_value=datum2_date)
         start_hour = st.number_input("Startstunde (0-23)", min_value=0, max_value=23, value=0)
-        end_date = st.date_input("Enddatum", value=datetime.today())
+        end_date = st.date_input("Enddatum",value=yesterday,min_value=datum1_date, max_value=datum2_date)
         end_hour = start_hour
 
     start_datetime = datetime.combine(start_date, time(start_hour, 0))
