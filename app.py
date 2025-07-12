@@ -4,7 +4,7 @@ import plotly.graph_objects as go
 import pandas as pd
 import requests
 from datetime import datetime, time, timedelta
-import psycopg2 as psy
+#import psycopg2 as psy
 from utils import get_latest_endzeitpunkt_iso, get_earliest_startzeitpunkt_iso
 
 # ------------------ Datenkonvertierung ------------------
@@ -113,12 +113,9 @@ def main():
     Vorhersage = np.array(converted2["historic_prediction"]).flatten()
     lower_hist = np.array(converted2["lower_hist"]).flatten()
     upper_hist = np.array(converted2["upper_hist"]).flatten()
-
     time_week = pd.date_range(start=converted2["zeit1"][0], periods=len(Wasserstand), freq='T')
     threshold_line_week = np.zeros(len(Wasserstand)) + hochwasser_schwelle
-
     error, mean_error, max_error, hit_rate, avg_interval = calculate_statistics(Wasserstand, Vorhersage, lower_hist, upper_hist)
-
     stats = converted2["statistics"]
 
     st.markdown(f"""
@@ -143,7 +140,7 @@ def main():
     datum2_date = datetime.fromisoformat(datum2).date()
     yesterday = datetime.today().date() - timedelta(days=1)
 
-    st.title("Zeitraum-Auswahl")
+    st.title("Ergebnisse als Excel-Export")
     col1, col2 = st.columns([1, 5])
 
     with col1:

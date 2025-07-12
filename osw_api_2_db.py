@@ -3,9 +3,6 @@ from config import api_url_template, conn_str
 from utils import *
 
 def inference( array, start):
-    #temp_arr = []
-    #historic_prediction = []
-    #historic_prediction_temp = []
     results = []
     model, kmeans, interval_matrix, chunk, cluster, time_teile, time_labels_klein = get_models()
 
@@ -38,7 +35,7 @@ def inference( array, start):
 
     return results
 
-    return results
+
 def load_in_db2(conn_str, results):
     with psy.connect(conn_str) as conn:
         with conn.cursor() as cur:
@@ -52,7 +49,7 @@ def load_in_db2(conn_str, results):
                 zeit1, zeit2, max_vergleich, max_upper, prediction, vergleich, lower, upper = zeile
 
                 if (zeit1, zeit2) in vorhandene:
-                    print(f"⚠️ Kombination {zeit1} - {zeit2} existiert bereits. Skip.")
+                    print(f" Kombination {zeit1} - {zeit2} existiert bereits. Skip.")
                     continue
 
                 # Metadata insert
@@ -66,7 +63,7 @@ def load_in_db2(conn_str, results):
                 for i in range(144):
                     buffer.write(f"{metadata_id}\t{i}\t{round(prediction[i*5], 1)}\t{round(vergleich[i*5], 1)}\t{round(lower[i*5], 1)}\t{round(upper[i*5], 1)}\n")
 
-                print(f"✅ Metadata ID {metadata_id} vorbereitet.")
+                print(f" Metadata ID {metadata_id} vorbereitet.")
 
             buffer.seek(0)
 
@@ -79,7 +76,7 @@ def load_in_db2(conn_str, results):
 
             conn.commit()
 
-            print("✅ Alle Daten mit COPY (psycopg2) eingespielt.")
+            print(" Alle Daten mit COPY (psycopg2) eingespielt.")
 
 if __name__ == "__main__":
     iso_date = get_latest_endzeitpunkt_iso(conn_str)

@@ -27,9 +27,7 @@ def warnung_generator(upper_peak, hist_peak):
     #print(f"Warn.und HW.: {TP}, Entwarn. aber HW: {FN}, Warn. aber K.HW: {FP}, Entwarn. und K. HW: {TN} ")
     return int(TP), int(FN), int(FP), int(TN)
 def inference_live(array, start):
-    #temp_arr = []
-    #historic_prediction = []
-    #historic_prediction_temp = []
+
     results = []
     model, kmeans, interval_matrix, chunk, cluster, time_teile, time_labels_klein = get_models()
     for i in range(1):
@@ -57,9 +55,6 @@ def inference_live(array, start):
         results.append(zeile)
     return results
 def inference_live2( array, start):
-    #temp_arr = []
-    #historic_prediction = []
-    #historic_prediction_temp = []
     results = []
     steps = len(array)//720 -1
     model, kmeans, interval_matrix, chunk, cluster, time_teile, time_labels_klein = get_models()
@@ -97,7 +92,6 @@ def load_time_series(conn_str, startzeit_iso, endzeit_iso):
         with conn.cursor() as cur:
             current_start = startzeit_iso
             results = []
-
             while True:
                 # Hole den ersten Datensatz, dessen startzeit = current_start ist
                 cur.execute("""
@@ -109,13 +103,11 @@ def load_time_series(conn_str, startzeit_iso, endzeit_iso):
                     LIMIT 1
                 """, (current_start, endzeit_iso))
                 row = cur.fetchone()
-
                 if not row:
                     print(f"⚠️ Keine weiteren Zeiträume gefunden ab {current_start}. Abbruch.")
                     break
 
                 metadata_id, startzeit, endzeit, max_value_historic, max_value_upperpi_80_perc = row
-
 
                 # Hole Zeitreihendaten für dieses metadata_id
                 cur.execute("""
@@ -126,13 +118,6 @@ def load_time_series(conn_str, startzeit_iso, endzeit_iso):
                 """, (metadata_id,))
                 data_rows = cur.fetchall()
 
-                # Check, ob wir weniger als 720 Minuten haben
-                #num_points = len(data_rows)
-                #if num_points < 144:
-                 #   print(f"⚠️ Zeitreihe bei {startzeit} - {endzeit} hat nur {num_points} Punkte (truncated).")
-                #elif num_points > 144:
-                 #   print(f"⚠️ Zeitreihe länger als 720 Punkte, wird abgeschnitten.")
-                  #  data_rows = data_rows[:144]
 
                 # Speichere Ergebnis
                 results.append({
@@ -147,7 +132,7 @@ def load_time_series(conn_str, startzeit_iso, endzeit_iso):
                 current_start = endzeit.strftime("%Y-%m-%dT%H:%M:%S")
                 # Prüfen, ob wir über Endzeit hinaus sind
                 if current_start >= endzeit_iso:
-                    print("✅ Endzeit erreicht oder überschritten. Fertig.")
+                    print("Endzeit erreicht oder überschritten. Fertig.")
                     break
             return results
 def stretch_array(arr):
@@ -158,7 +143,6 @@ def stretch_array(arr):
     new_arr = np.interp(new_indices, old_indices, arr)
     return new_arr.tolist()
 def extract_and_stretch(results):
-    """Extrahiert Spalten aus einem Block und interpoliert sie."""
     pred_ = []
     hist_ = []
     lower_ = []
