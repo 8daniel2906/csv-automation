@@ -130,7 +130,7 @@ def main():
     st.plotly_chart(plot_week_prediction(time_week, Wasserstand, Vorhersage, error, lower_hist, upper_hist, threshold_line_week, mean_error, max_error, hit_rate, avg_interval))
 
     st.markdown("---")
-'''
+def deaktivierter_code():
 
     # Zeitraum-Auswahl & Download
     conn_str = "postgresql://neondb_owner:npg_mPqZi9CG2txF@ep-divine-mud-a90zxdvg-pooler.gwc.azure.neon.tech/neondb?sslmode=require&channel_binding=require"
@@ -169,6 +169,7 @@ def main():
             )
         else:
             st.error(f"Fehler beim Laden der Datei: {response.status_code}")
-'''
+    pass
+
 if __name__ == "__main__":
     main()
